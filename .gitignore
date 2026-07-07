@@ -1,0 +1,22 @@
+# Local design docs and agent guidance (not committed)
+/docs/
+.agents/
+ARCHITECTURE.md
+MODULE_CONTRACTS.md
+
+# Python
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.venv/
+.env
+*.sqlite
+*.db
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+npm-debug.log*

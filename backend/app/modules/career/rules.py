@@ -1,0 +1,1 @@
+CAREER_RULE_NAMESPACE = "career"

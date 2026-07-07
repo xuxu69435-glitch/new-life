@@ -1,0 +1,1 @@
+IDENTITY_RULE_NAMESPACE = "identity"

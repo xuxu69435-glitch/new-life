@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Text Life Simulation Rule Set v1",
+  "type": "object",
+  "required": [
+    "version",
+    "life_stages",
+    "default_attributes",
+    "health_lifetime",
+    "random_events",
+    "inheritance"
+  ],
+  "properties": {
+    "version": {"type": "string", "minLength": 1},
+    "life_stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "min_age", "max_age"],
+        "properties": {
+          "name": {"type": "string"},
+          "min_age": {"type": "integer"},
+          "max_age": {"type": "integer"}
+        }
+      }
+    },
+    "default_attributes": {"type": "object", "minProperties": 1},
+    "default_health": {"type": "object"},
+    "default_assets": {"type": "object"},
+    "health_lifetime": {"type": "object", "minProperties": 1},
+    "random_events": {
+      "type": "object",
+      "required": ["direct_death_probability_limit", "event_pool"],
+      "properties": {
+        "direct_death_probability_limit": {"type": "number"},
+        "event_pool": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "category", "stage", "probability", "direct_death", "weight"],
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "category": {"type": "string"},
+              "stage": {"type": "string"},
+              "probability": {"type": "number", "minimum": 0, "maximum": 1},
+              "direct_death": {"type": "boolean"},
+              "weight": {"type": "number", "minimum": 0},
+              "conditions": {"type": "object"},
+              "effects": {"type": "object"},
+              "narrative_text": {"type": "string"},
+              "death_reason": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "inheritance": {
+      "type": "object",
+      "required": ["tax_rate"],
+      "properties": {
+        "tax_rate": {"type": "number"},
+        "default_heirs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "education": {"type": "object"},
+    "career": {"type": "object"},
+    "family": {"type": "object"},
+    "narrative_templates": {"type": "object"},
+    "available_choices": {"type": "object"}
+  }
+}

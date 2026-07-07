@@ -1,0 +1,1 @@
+EDUCATION_RULE_NAMESPACE = "education"

@@ -1,0 +1,151 @@
+{
+  "version": "v1",
+  "life_stages": [
+    {"name": "infant", "min_age": 0, "max_age": 2},
+    {"name": "childhood", "min_age": 3, "max_age": 12},
+    {"name": "teen", "min_age": 13, "max_age": 17},
+    {"name": "adult", "min_age": 18, "max_age": 64},
+    {"name": "elder", "min_age": 65, "max_age": 200}
+  ],
+  "default_attributes": {
+    "intelligence": 50,
+    "self_discipline": 50,
+    "charm": 50,
+    "stress_resistance": 50
+  },
+  "default_health": {
+    "physical": 100,
+    "mental": 100
+  },
+  "default_assets": {
+    "cash": 0.0,
+    "debt": 0.0
+  },
+  "health_lifetime": {
+    "full_health_longevity_age": 90,
+    "natural_death_check_age": 90,
+    "low_health_floor_age": 70,
+    "disease_warning_years": 3,
+    "last_year_decline_warning": true,
+    "natural_death_probability": 0.1
+  },
+  "random_events": {
+    "direct_death_probability_limit": 0.03,
+    "event_pool": [
+      {
+        "id": "infant_growth_milestone",
+        "name": "Early growth milestone",
+        "category": "growth",
+        "stage": "infant",
+        "probability": 0.05,
+        "direct_death": false,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "A small milestone marks the beginning of growth."
+      },
+      {
+        "id": "student_learning_event",
+        "name": "Focused study year",
+        "category": "growth",
+        "stage": "teen",
+        "probability": 0.08,
+        "direct_death": false,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "Study habits begin to take shape."
+      },
+      {
+        "id": "adult_wealth_opportunity",
+        "name": "Unexpected income opportunity",
+        "category": "wealth",
+        "stage": "adult",
+        "probability": 0.06,
+        "direct_death": false,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "A modest financial opportunity appears."
+      },
+      {
+        "id": "elder_health_check",
+        "name": "Routine health concern",
+        "category": "health",
+        "stage": "elder",
+        "probability": 0.07,
+        "direct_death": false,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "Health needs more attention this year."
+      },
+      {
+        "id": "family_gathering",
+        "name": "Family gathering",
+        "category": "family",
+        "stage": "any",
+        "probability": 0.04,
+        "direct_death": false,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "Family members gather for a shared moment."
+      },
+      {
+        "id": "quiet_year",
+        "name": "Quiet year",
+        "category": "normal",
+        "stage": "any",
+        "probability": 0.0,
+        "direct_death": false,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "Nothing unusual happens this year."
+      },
+      {
+        "id": "fatal_accident",
+        "name": "Fatal accident",
+        "category": "direct_death",
+        "stage": "any",
+        "probability": 0.01,
+        "direct_death": true,
+        "weight": 1.0,
+        "conditions": {},
+        "effects": {},
+        "narrative_text": "A sudden accident creates a fatal outcome.",
+        "death_reason": "Fatal accident"
+      }
+    ]
+  },
+  "inheritance": {
+    "tax_rate": 0.2,
+    "default_heirs": ["partner", "descendants"]
+  },
+  "education": {
+    "default_track": "not_started",
+    "placeholder": true,
+    "tracks": []
+  },
+  "career": {
+    "placeholder_income": 1000.0,
+    "placeholder": true,
+    "paths": []
+  },
+  "family": {
+    "placeholder": true,
+    "relation_templates": []
+  },
+  "narrative_templates": {
+    "placeholder": true,
+    "templates": []
+  },
+  "available_choices": {
+    "default": [
+      {"id": "balanced_year", "label": "Balanced year"},
+      {"id": "study_focus", "label": "Focus on study"},
+      {"id": "rest_focus", "label": "Focus on rest"}
+    ]
+  }
+}

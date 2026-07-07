@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240" role="img" aria-label="Life archive illustration">
+  <rect width="640" height="240" fill="#f4f1e8"/>
+  <path d="M0 36H640M0 84H640M0 132H640M0 180H640M92 0V240M318 0V240M546 0V240" stroke="#d4cbb8" stroke-width="2"/>
+  <path d="M78 182C126 126 176 128 212 84C256 31 322 60 348 112C376 168 438 156 484 102C520 60 572 68 622 114" fill="none" stroke="#315f72" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="78" cy="182" r="13" fill="#a23e48"/>
+  <circle cx="212" cy="84" r="13" fill="#315f72"/>
+  <circle cx="348" cy="112" r="13" fill="#6f7f4b"/>
+  <circle cx="484" cy="102" r="13" fill="#a66a34"/>
+  <circle cx="622" cy="114" r="13" fill="#315f72"/>
+</svg>

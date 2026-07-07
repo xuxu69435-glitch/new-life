@@ -1,0 +1,1 @@
+INHERITANCE_RULE_NAMESPACE = "inheritance"

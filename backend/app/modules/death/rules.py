@@ -1,0 +1,1 @@
+DEATH_RULE_NAMESPACE = "death"
