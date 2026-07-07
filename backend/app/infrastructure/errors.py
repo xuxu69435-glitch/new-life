@@ -16,3 +16,7 @@ class RuleLoadError(DomainError):
 
 class RuleValidationError(DomainError):
     """Raised when loaded rules violate engine safety constraints."""
+
+
+class RandomEventEffectError(DomainError):
+    """Raised when a random event effect cannot be parsed or applied."""

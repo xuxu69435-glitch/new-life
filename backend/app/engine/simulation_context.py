@@ -18,6 +18,7 @@ class SimulationEventType(str, Enum):
     FAMILY_RELATION_CHANGE_REQUESTED = "FamilyRelationChangeRequested"
     INHERITANCE_REQUESTED = "InheritanceRequested"
     NARRATIVE_REQUESTED = "NarrativeRequested"
+    FLAG_SET_REQUESTED = "FlagSetRequested"
     LIFE_STAGE_CHANGED = "LifeStageChanged"
     ASSET_CHANGE_REQUESTED = "AssetChangeRequested"
 
@@ -62,6 +63,11 @@ class YearResult(BaseModel):
     health_score_delta: int = 0
     new_health_warnings: list[str] = Field(default_factory=list)
     natural_death_candidate_created: bool = False
+    direct_death_candidate_created: bool = False
+    triggered_random_events: list[dict[str, Any]] = Field(default_factory=list)
+    random_event_attribute_changes: dict[str, int] = Field(default_factory=dict)
+    random_event_health_changes: dict[str, int] = Field(default_factory=dict)
+    random_event_asset_changes: dict[str, float] = Field(default_factory=dict)
     occurred_events: list[SimulationEvent] = Field(default_factory=list)
     narrative_text: str = ""
     next_available_choices: list[dict[str, Any]] = Field(default_factory=list)

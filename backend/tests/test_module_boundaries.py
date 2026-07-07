@@ -29,6 +29,17 @@ def test_random_event_module_does_not_set_death(life_state, rules) -> None:
             "direct_death": True,
             "weight": 1.0,
             "death_reason": "Fatal placeholder",
+            "conditions": {},
+            "effects": [
+                {
+                    "type": "direct_death_candidate",
+                    "target": "death",
+                    "value": 1,
+                    "reason": "Fatal placeholder",
+                    "source_event_id": "fatal_placeholder",
+                    "source_event_name": "Fatal placeholder",
+                }
+            ],
         }
     ]
     context = make_context(life_state, rules)

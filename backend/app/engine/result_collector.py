@@ -1,9 +1,12 @@
 from typing import Any
 
 from app.engine.simulation_context import LifeState, SimulationEvent, SimulationEventType, YearResult
+from app.modules.health.sync import apply_post_health_changes
 
 
 class ResultCollector:
+    RANDOM_EVENT_SOURCE = "random_events"
+
     def __init__(self) -> None:
         self.changed_attributes: dict[str, int] = {}
         self.changed_health: dict[str, int] = {}
@@ -20,6 +23,13 @@ class ResultCollector:
         self.health_level_after: str | None = None
         self.new_health_warnings: list[str] = []
         self.natural_death_candidate_created: bool = False
+        self.direct_death_candidate_created: bool = False
+        self.post_health_changes: dict[str, int] = {}
+        self.changed_flags: dict[str, Any] = {}
+        self.triggered_random_events: list[dict[str, Any]] = []
+        self.random_event_attribute_changes: dict[str, int] = {}
+        self.random_event_health_changes: dict[str, int] = {}
+        self.random_event_asset_changes: dict[str, float] = {}
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -50,16 +60,48 @@ class ResultCollector:
     def set_inheritance_result(self, result: dict[str, Any]) -> None:
         self.inheritance_result = result
 
+    def _track_random_event_change(
+        self,
+        source_module: str,
+        category: str,
+        key: str,
+        delta: int | float,
+    ) -> None:
+        if source_module != self.RANDOM_EVENT_SOURCE:
+            return
+        if category == "attribute":
+            self.random_event_attribute_changes[key] = int(
+                self.random_event_attribute_changes.get(key, 0)
+            ) + int(delta)
+        elif category == "health":
+            self.random_event_health_changes[key] = int(
+                self.random_event_health_changes.get(key, 0)
+            ) + int(delta)
+        elif category == "asset":
+            self.random_event_asset_changes[key] = float(
+                self.random_event_asset_changes.get(key, 0.0)
+            ) + float(delta)
+
     def collect_from_events(self, events: list[SimulationEvent]) -> None:
         for index, event in enumerate(events):
             if index in self._processed_event_ids:
                 continue
             self._processed_event_ids.add(index)
             payload = event.payload
-            if event.event_type == SimulationEventType.ATTRIBUTE_CHANGE_REQUESTED:
-                self.request_attribute_change(str(payload["key"]), int(payload.get("delta", 0)))
+            if event.event_type == SimulationEventType.RANDOM_EVENT_TRIGGERED:
+                self.triggered_random_events.append(dict(payload))
+            elif event.event_type == SimulationEventType.ATTRIBUTE_CHANGE_REQUESTED:
+                key = str(payload["key"])
+                delta = int(payload.get("delta", 0))
+                self.request_attribute_change(key, delta)
+                self._track_random_event_change(event.source_module, "attribute", key, delta)
             elif event.event_type == SimulationEventType.HEALTH_CHANGE_REQUESTED:
-                self.request_health_change(str(payload["key"]), int(payload.get("delta", 0)))
+                key = str(payload["key"])
+                delta = int(payload.get("delta", 0))
+                self.request_health_change(key, delta)
+                if event.source_module != "health":
+                    self.post_health_changes[key] = self.post_health_changes.get(key, 0) + delta
+                self._track_random_event_change(event.source_module, "health", key, delta)
             elif event.event_type == SimulationEventType.HEALTH_STATE_UPDATE_REQUESTED:
                 self.health_state_update = dict(payload.get("health", {}))
                 self.health_score_before = payload.get("health_score_before")
@@ -74,11 +116,23 @@ class ResultCollector:
                 if warning_text:
                     self.new_health_warnings.append(warning_text)
             elif event.event_type == SimulationEventType.ASSET_CHANGE_REQUESTED:
-                self.request_asset_change(str(payload["key"]), float(payload.get("delta", 0.0)))
+                key = str(payload["key"])
+                delta = float(payload.get("delta", 0.0))
+                self.request_asset_change(key, delta)
+                self._track_random_event_change(event.source_module, "asset", key, delta)
+            elif event.event_type == SimulationEventType.DIRECT_DEATH_CANDIDATE_CREATED:
+                if event.source_module == self.RANDOM_EVENT_SOURCE:
+                    self.direct_death_candidate_created = True
+            elif event.event_type == SimulationEventType.NARRATIVE_REQUESTED:
+                text = str(payload.get("text", ""))
+                if text:
+                    self.add_narrative(text)
+            elif event.event_type == SimulationEventType.FLAG_SET_REQUESTED:
+                self.changed_flags[str(payload["key"])] = payload.get("value")
             elif event.event_type == SimulationEventType.LIFE_STAGE_CHANGED:
                 self.change_life_stage(str(payload["life_stage"]))
 
-    def apply_to_state(self, state: LifeState) -> LifeState:
+    def apply_to_state(self, state: LifeState, rules: dict | None = None) -> LifeState:
         next_state = state.model_copy(deep=True)
         next_state.age += 1
         if self.life_stage is not None:
@@ -89,12 +143,27 @@ class ResultCollector:
 
         if self.health_state_update is not None:
             next_state.health = dict(self.health_state_update)
+            if self.post_health_changes and rules is not None:
+                next_state.health = apply_post_health_changes(
+                    next_state.health,
+                    self.post_health_changes,
+                    rules,
+                )
+                if "health_score" in self.post_health_changes:
+                    self.health_score_after = int(next_state.health.get("health_score", 0))
+                    self.health_level_after = str(next_state.health.get("health_level", ""))
         else:
             for key, delta in self.changed_health.items():
-                next_state.health[key] = int(next_state.health.get(key, 0)) + delta
+                if key == "health_score":
+                    next_state.health[key] = int(next_state.health.get(key, 0)) + delta
+                else:
+                    next_state.health[key] = int(next_state.health.get(key, 0)) + delta
 
         for key, delta in self.changed_assets.items():
             next_state.assets[key] = float(next_state.assets.get(key, 0.0)) + delta
+
+        for key, value in self.changed_flags.items():
+            next_state.flags[key] = value
 
         if self.death_reason is not None:
             next_state.is_dead = True
@@ -129,6 +198,11 @@ class ResultCollector:
             health_score_delta=health_score_delta,
             new_health_warnings=list(self.new_health_warnings),
             natural_death_candidate_created=self.natural_death_candidate_created,
+            direct_death_candidate_created=self.direct_death_candidate_created,
+            triggered_random_events=list(self.triggered_random_events),
+            random_event_attribute_changes=dict(self.random_event_attribute_changes),
+            random_event_health_changes=dict(self.random_event_health_changes),
+            random_event_asset_changes=dict(self.random_event_asset_changes),
             occurred_events=occurred_events,
             narrative_text="\n".join(self.narrative_lines),
             next_available_choices=next_available_choices,

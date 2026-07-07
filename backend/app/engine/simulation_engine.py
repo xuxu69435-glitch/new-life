@@ -69,7 +69,7 @@ class SimulationEngine:
         self.narrative_module.run(context)
         context.result_collector.collect_from_events(context.event_bus.all())
 
-        next_state = context.result_collector.apply_to_state(current_state)
+        next_state = context.result_collector.apply_to_state(current_state, rules)
         next_choices = [] if next_state.is_dead else self.get_available_choices(next_state, rules)
         result = context.result_collector.to_year_result(
             before=current_state,

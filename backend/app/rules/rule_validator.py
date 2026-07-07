@@ -11,6 +11,14 @@ class RuleValidator:
         "wealth",
         "direct_death",
     }
+    ALLOWED_EFFECT_TYPES = {
+        "attribute_change",
+        "health_change",
+        "asset_change",
+        "direct_death_candidate",
+        "narrative_tag",
+        "flag_set",
+    }
 
     def validate(self, rules: dict) -> None:
         self._validate_version(rules)
@@ -107,7 +115,77 @@ class RuleValidator:
                     f"Random event '{event.id}' has unsupported category: {event.category}."
                 )
 
+            self._validate_event_effects(raw_event, event)
+
         self._validate_direct_death_probability(random_rules, event_pool)
+
+    def _validate_event_effects(self, raw_event: dict, event: RandomEventRule) -> None:
+        effects = raw_event.get("effects", [])
+        if effects is None:
+            effects = []
+        if isinstance(effects, dict):
+            if effects:
+                raise RuleValidationError(
+                    f"Random event '{event.id}' effects must be a list."
+                )
+            effects = []
+        if not isinstance(effects, list):
+            raise RuleValidationError(f"Random event '{event.id}' effects must be a list.")
+
+        has_direct_death_effect = False
+        for effect in effects:
+            if not isinstance(effect, dict):
+                raise RuleValidationError(
+                    f"Random event '{event.id}' contains a non-object effect."
+                )
+            effect_type = str(effect.get("type", "")).strip()
+            if not effect_type:
+                raise RuleValidationError(
+                    f"Random event '{event.id}' has an effect with empty type."
+                )
+            if effect_type not in self.ALLOWED_EFFECT_TYPES:
+                raise RuleValidationError(
+                    f"Random event '{event.id}' has unsupported effect type: {effect_type}."
+                )
+            if effect_type == "direct_death_candidate":
+                has_direct_death_effect = True
+                if not event.direct_death:
+                    raise RuleValidationError(
+                        f"Random event '{event.id}' cannot include direct_death_candidate "
+                        "when direct_death is false."
+                    )
+            elif event.direct_death:
+                raise RuleValidationError(
+                    f"Direct death event '{event.id}' can only include direct_death_candidate effects."
+                )
+
+            if effect_type == "attribute_change":
+                if not effect.get("target"):
+                    raise RuleValidationError(
+                        f"Random event '{event.id}' attribute_change requires target."
+                    )
+                if "value" not in effect:
+                    raise RuleValidationError(
+                        f"Random event '{event.id}' attribute_change requires value."
+                    )
+            if effect_type == "health_change" and "value" not in effect:
+                raise RuleValidationError(
+                    f"Random event '{event.id}' health_change requires value."
+                )
+            if effect_type == "asset_change":
+                if not effect.get("target"):
+                    raise RuleValidationError(
+                        f"Random event '{event.id}' asset_change requires target."
+                    )
+                if "value" not in effect:
+                    raise RuleValidationError(
+                        f"Random event '{event.id}' asset_change requires value."
+                    )
+
+        if event.direct_death and not has_direct_death_effect:
+            raise RuleValidationError(
+                f"Direct death event '{event.id}' must include direct_death_candidate effect."
+            )
 
     def _validate_direct_death_probability(
         self,

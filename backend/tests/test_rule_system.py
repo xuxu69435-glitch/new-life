@@ -115,6 +115,17 @@ def test_direct_death_probability_equal_to_three_percent_passes(rules) -> None:
             "probability": 0.015,
             "direct_death": True,
             "weight": 1.0,
+            "conditions": {},
+            "effects": [
+                {
+                    "type": "direct_death_candidate",
+                    "target": "death",
+                    "value": 1,
+                    "reason": "Death A",
+                    "source_event_id": "death_a",
+                    "source_event_name": "Death A",
+                }
+            ],
         },
         {
             "id": "death_b",
@@ -124,6 +135,17 @@ def test_direct_death_probability_equal_to_three_percent_passes(rules) -> None:
             "probability": 0.015,
             "direct_death": True,
             "weight": 1.0,
+            "conditions": {},
+            "effects": [
+                {
+                    "type": "direct_death_candidate",
+                    "target": "death",
+                    "value": 1,
+                    "reason": "Death B",
+                    "source_event_id": "death_b",
+                    "source_event_name": "Death B",
+                }
+            ],
         },
     ]
 
@@ -141,6 +163,17 @@ def test_direct_death_probability_over_three_percent_fails(rules) -> None:
             "probability": 0.02,
             "direct_death": True,
             "weight": 1.0,
+            "conditions": {},
+            "effects": [
+                {
+                    "type": "direct_death_candidate",
+                    "target": "death",
+                    "value": 1,
+                    "reason": "Death A",
+                    "source_event_id": "death_a",
+                    "source_event_name": "Death A",
+                }
+            ],
         },
         {
             "id": "death_b",
@@ -150,6 +183,17 @@ def test_direct_death_probability_over_three_percent_fails(rules) -> None:
             "probability": 0.02,
             "direct_death": True,
             "weight": 1.0,
+            "conditions": {},
+            "effects": [
+                {
+                    "type": "direct_death_candidate",
+                    "target": "death",
+                    "value": 1,
+                    "reason": "Death B",
+                    "source_event_id": "death_b",
+                    "source_event_name": "Death B",
+                }
+            ],
         },
     ]
 
@@ -168,6 +212,17 @@ def test_random_event_direct_death_publishes_candidate_only(life_state, rules) -
             "direct_death": True,
             "weight": 1.0,
             "death_reason": "Fatal placeholder",
+            "conditions": {},
+            "effects": [
+                {
+                    "type": "direct_death_candidate",
+                    "target": "death",
+                    "value": 1,
+                    "reason": "Fatal placeholder",
+                    "source_event_id": "fatal_placeholder",
+                    "source_event_name": "Fatal placeholder",
+                }
+            ],
         }
     ]
     context = make_context(life_state, rules)

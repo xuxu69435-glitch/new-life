@@ -26,6 +26,13 @@ export type SimulationEvent = {
   payload: Record<string, unknown>;
 };
 
+export type TriggeredRandomEvent = {
+  event_id: string;
+  name: string;
+  category: string;
+  narrative_text: string;
+};
+
 export type YearResult = {
   life_id: string;
   age_before: number;
@@ -43,6 +50,11 @@ export type YearResult = {
   health_score_delta: number;
   new_health_warnings: string[];
   natural_death_candidate_created: boolean;
+  direct_death_candidate_created: boolean;
+  triggered_random_events: TriggeredRandomEvent[];
+  random_event_attribute_changes: Record<string, number>;
+  random_event_health_changes: Record<string, number>;
+  random_event_asset_changes: Record<string, number>;
   occurred_events: SimulationEvent[];
   narrative_text: string;
   next_available_choices: AvailableChoice[];

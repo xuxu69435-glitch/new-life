@@ -128,7 +128,26 @@
         "direct_death": false,
         "weight": 1.0,
         "conditions": {},
-        "effects": {},
+        "effects": [
+          {
+            "type": "health_change",
+            "target": "health_score",
+            "value": 2,
+            "reason": "Healthy early growth",
+            "source_event_id": "infant_growth_milestone",
+            "source_event_name": "Early growth milestone",
+            "conditions": {}
+          },
+          {
+            "type": "attribute_change",
+            "target": "charm",
+            "value": 1,
+            "reason": "Social warmth develops",
+            "source_event_id": "infant_growth_milestone",
+            "source_event_name": "Early growth milestone",
+            "conditions": {}
+          }
+        ],
         "narrative_text": "A small milestone marks the beginning of growth."
       },
       {
@@ -140,7 +159,26 @@
         "direct_death": false,
         "weight": 1.0,
         "conditions": {},
-        "effects": {},
+        "effects": [
+          {
+            "type": "attribute_change",
+            "target": "intelligence",
+            "value": 3,
+            "reason": "Focused study improves intelligence",
+            "source_event_id": "student_learning_event",
+            "source_event_name": "Focused study year",
+            "conditions": {}
+          },
+          {
+            "type": "attribute_change",
+            "target": "stress_resistance",
+            "value": -1,
+            "reason": "Study pressure increases stress",
+            "source_event_id": "student_learning_event",
+            "source_event_name": "Focused study year",
+            "conditions": {}
+          }
+        ],
         "narrative_text": "Study habits begin to take shape."
       },
       {
@@ -152,7 +190,26 @@
         "direct_death": false,
         "weight": 1.0,
         "conditions": {},
-        "effects": {},
+        "effects": [
+          {
+            "type": "asset_change",
+            "target": "cash",
+            "value": 500,
+            "reason": "Side income from a small opportunity",
+            "source_event_id": "adult_wealth_opportunity",
+            "source_event_name": "Unexpected income opportunity",
+            "conditions": {}
+          },
+          {
+            "type": "narrative_tag",
+            "target": "wealth_gain",
+            "value": "wealth_gain",
+            "reason": "A modest financial opportunity appears.",
+            "source_event_id": "adult_wealth_opportunity",
+            "source_event_name": "Unexpected income opportunity",
+            "conditions": {}
+          }
+        ],
         "narrative_text": "A modest financial opportunity appears."
       },
       {
@@ -164,7 +221,17 @@
         "direct_death": false,
         "weight": 1.0,
         "conditions": {},
-        "effects": {},
+        "effects": [
+          {
+            "type": "health_change",
+            "target": "health_score",
+            "value": -3,
+            "reason": "Routine health concern lowers vitality",
+            "source_event_id": "elder_health_check",
+            "source_event_name": "Routine health concern",
+            "conditions": {}
+          }
+        ],
         "narrative_text": "Health needs more attention this year."
       },
       {
@@ -200,7 +267,17 @@
         "direct_death": true,
         "weight": 1.0,
         "conditions": {},
-        "effects": {},
+        "effects": [
+          {
+            "type": "direct_death_candidate",
+            "target": "death",
+            "value": 1,
+            "reason": "Fatal accident",
+            "source_event_id": "fatal_accident",
+            "source_event_name": "Fatal accident",
+            "conditions": {}
+          }
+        ],
         "narrative_text": "A sudden accident creates a fatal outcome.",
         "death_reason": "Fatal accident"
       }
