@@ -40,6 +40,22 @@ class RuleValidator:
         if not health_rules:
             raise RuleValidationError("Rule config must include health rules.")
 
+        if not health_rules.get("health_score"):
+            raise RuleValidationError("Health rules must include health_score config.")
+
+        health_levels = health_rules.get("health_levels")
+        if not health_levels:
+            raise RuleValidationError("Health rules must include health_levels.")
+
+        if not health_rules.get("natural_death"):
+            raise RuleValidationError("Health rules must include natural_death config.")
+
+        if not health_rules.get("warnings"):
+            raise RuleValidationError("Health rules must include warnings config.")
+
+        if not health_rules.get("disease_pool"):
+            raise RuleValidationError("Health rules must include disease_pool.")
+
     def _validate_inheritance(self, rules: dict) -> None:
         inheritance = rules.get("inheritance")
         if not inheritance:

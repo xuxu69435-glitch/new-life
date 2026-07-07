@@ -9,6 +9,8 @@ from app.infrastructure.rng import ServerRandom
 class SimulationEventType(str, Enum):
     ATTRIBUTE_CHANGE_REQUESTED = "AttributeChangeRequested"
     HEALTH_CHANGE_REQUESTED = "HealthChangeRequested"
+    HEALTH_WARNING_CREATED = "HealthWarningCreated"
+    HEALTH_STATE_UPDATE_REQUESTED = "HealthStateUpdateRequested"
     RANDOM_EVENT_TRIGGERED = "RandomEventTriggered"
     NATURAL_DEATH_CANDIDATE_CREATED = "NaturalDeathCandidateCreated"
     DIRECT_DEATH_CANDIDATE_CREATED = "DirectDeathCandidateCreated"
@@ -28,7 +30,7 @@ class LifeState(BaseModel):
     is_dead: bool = False
     death_reason: str | None = None
     attributes: dict[str, int] = Field(default_factory=dict)
-    health: dict[str, int] = Field(default_factory=dict)
+    health: dict[str, Any] = Field(default_factory=dict)
     family: dict[str, Any] = Field(default_factory=dict)
     education: dict[str, Any] = Field(default_factory=dict)
     career: dict[str, Any] = Field(default_factory=dict)
@@ -49,9 +51,17 @@ class YearResult(BaseModel):
     age_after: int
     is_dead: bool
     death_reason: str | None = None
+    death_type: str | None = None
     changed_attributes: dict[str, int] = Field(default_factory=dict)
     changed_health: dict[str, int] = Field(default_factory=dict)
     changed_assets: dict[str, float] = Field(default_factory=dict)
+    health_score_before: int | None = None
+    health_score_after: int | None = None
+    health_level_before: str | None = None
+    health_level_after: str | None = None
+    health_score_delta: int = 0
+    new_health_warnings: list[str] = Field(default_factory=list)
+    natural_death_candidate_created: bool = False
     occurred_events: list[SimulationEvent] = Field(default_factory=list)
     narrative_text: str = ""
     next_available_choices: list[dict[str, Any]] = Field(default_factory=list)

@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from app.engine.simulation_context import LifeState, YearResult
+from app.modules.health.rules import build_default_health_state
 
 
 class SaveService:
@@ -18,7 +19,7 @@ class SaveService:
             age=0,
             life_stage="infant",
             attributes=dict(rules.get("default_attributes", {})),
-            health=dict(rules.get("default_health", {})),
+            health=build_default_health_state(rules).to_life_state_dict(),
             family={"relations": []},
             education={"track": rules.get("education", {}).get("default_track", "not_started")},
             career={"title": "none", "income": 0.0},

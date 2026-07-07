@@ -1,1 +1,6 @@
-ALLOWED_EVENTS = ["HealthChangeRequested", "NaturalDeathCandidateCreated"]
+ALLOWED_EVENTS = [
+    "HealthChangeRequested",
+    "HealthWarningCreated",
+    "HealthStateUpdateRequested",
+    "NaturalDeathCandidateCreated",
+]

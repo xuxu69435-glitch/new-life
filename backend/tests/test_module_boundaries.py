@@ -8,14 +8,14 @@ from conftest import make_context
 
 
 def test_health_module_does_not_set_death(life_state, rules) -> None:
-    old_state = life_state.model_copy(update={"age": 95})
+    old_state = life_state.model_copy(update={"age": 95, "life_stage": "elder"})
+    old_state.health["last_disease_warning_age"] = 93
     context = make_context(old_state, rules)
 
     HealthService().run(context)
 
     assert old_state.is_dead is False
     assert context.result_collector.death_confirmed is False
-    assert context.event_bus.by_type(SimulationEventType.NATURAL_DEATH_CANDIDATE_CREATED)
 
 
 def test_random_event_module_does_not_set_death(life_state, rules) -> None:

@@ -23,6 +23,7 @@ class RandomEventsService:
                     self.name,
                     {
                         "reason": event_def.death_reason or event_def.display_name(),
+                        "death_type": "direct_death",
                         "probability": 1.0,
                         "event_id": event_def.id,
                         "category": event_def.category,

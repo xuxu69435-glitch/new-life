@@ -6,7 +6,7 @@ export type LifeState = {
   is_dead: boolean;
   death_reason: string | null;
   attributes: Record<string, number>;
-  health: Record<string, number>;
+  health: Record<string, unknown>;
   family: Record<string, unknown>;
   education: Record<string, unknown>;
   career: Record<string, unknown>;
@@ -32,9 +32,17 @@ export type YearResult = {
   age_after: number;
   is_dead: boolean;
   death_reason: string | null;
+  death_type: string | null;
   changed_attributes: Record<string, number>;
   changed_health: Record<string, number>;
   changed_assets: Record<string, number>;
+  health_score_before: number | null;
+  health_score_after: number | null;
+  health_level_before: string | null;
+  health_level_after: string | null;
+  health_score_delta: number;
+  new_health_warnings: string[];
+  natural_death_candidate_created: boolean;
   occurred_events: SimulationEvent[];
   narrative_text: string;
   next_available_choices: AvailableChoice[];

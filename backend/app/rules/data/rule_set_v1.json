@@ -14,20 +14,107 @@
     "stress_resistance": 50
   },
   "default_health": {
+    "health_score": 100,
+    "health_level": "excellent",
     "physical": 100,
-    "mental": 100
+    "mental": 100,
+    "diseases": [],
+    "warnings": [],
+    "natural_life_floor": 90,
+    "natural_death_eligible_age": 90,
+    "last_health_change": 0,
+    "years_with_disease_warning": 999,
+    "years_with_decline_warning": 999,
+    "last_disease_warning_age": null,
+    "last_decline_warning_age": null
   },
   "default_assets": {
     "cash": 0.0,
     "debt": 0.0
   },
   "health_lifetime": {
-    "full_health_longevity_age": 90,
-    "natural_death_check_age": 90,
-    "low_health_floor_age": 70,
-    "disease_warning_years": 3,
-    "last_year_decline_warning": true,
-    "natural_death_probability": 0.1
+    "health_score": {
+      "max": 100,
+      "min": 0,
+      "initial": 100
+    },
+    "health_levels": [
+      {
+        "name": "excellent",
+        "min_score": 90,
+        "max_score": 100,
+        "natural_death_eligible_age": 90,
+        "natural_life_floor": 90,
+        "can_enter_high_longevity": true
+      },
+      {
+        "name": "good",
+        "min_score": 75,
+        "max_score": 89,
+        "natural_death_eligible_age": 85,
+        "natural_life_floor": 80,
+        "can_enter_high_longevity": false
+      },
+      {
+        "name": "normal",
+        "min_score": 50,
+        "max_score": 74,
+        "natural_death_eligible_age": 78,
+        "natural_life_floor": 70,
+        "can_enter_high_longevity": false
+      },
+      {
+        "name": "poor",
+        "min_score": 25,
+        "max_score": 49,
+        "natural_death_eligible_age": 70,
+        "natural_life_floor": 60,
+        "can_enter_high_longevity": false
+      },
+      {
+        "name": "critical",
+        "min_score": 0,
+        "max_score": 24,
+        "natural_death_eligible_age": 60,
+        "natural_life_floor": 50,
+        "can_enter_high_longevity": false
+      }
+    ],
+    "longevity": {
+      "high_longevity_check_age": 90
+    },
+    "natural_death": {
+      "base_probability_at_90": 0.05,
+      "probability_increment_per_year_after_90": 0.03,
+      "max_probability": 0.95,
+      "pre_longevity_probability_by_level": {
+        "excellent": 0.0,
+        "good": 0.005,
+        "normal": 0.01,
+        "poor": 0.02,
+        "critical": 0.03
+      }
+    },
+    "warnings": {
+      "disease_warning_years": 3,
+      "require_decline_warning_last_year": true,
+      "decline_warning_text": "Your body is visibly declining."
+    },
+    "annual_decay_by_stage": {
+      "infant": 0,
+      "childhood": 1,
+      "teen": 1,
+      "adult": 2,
+      "elder": 4
+    },
+    "default_annual_decay": 1,
+    "rest_focus_recovery": 1,
+    "disease_pool": [
+      {"id": "chronic_fatigue", "name": "Chronic fatigue"},
+      {"id": "recurrent_fever", "name": "Recurrent fever"},
+      {"id": "cardiopulmonary_decline", "name": "Cardiopulmonary decline"},
+      {"id": "long_term_weakness", "name": "Long-term weakness"}
+    ]
   },
   "random_events": {
     "direct_death_probability_limit": 0.03,

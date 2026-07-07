@@ -10,12 +10,50 @@ export function YearResultPanel() {
       {result ? (
         <>
           <p className="narrative-text">{result.narrative_text}</p>
+          {result.health_score_before !== null && result.health_score_after !== null ? (
+            <div className="change-block">
+              <h3>Health summary</h3>
+              <p>
+                <span>Score</span>
+                <strong>
+                  {result.health_score_before} → {result.health_score_after}
+                  {result.health_score_delta !== 0
+                    ? ` (${result.health_score_delta > 0 ? "+" : ""}${result.health_score_delta})`
+                    : ""}
+                </strong>
+              </p>
+              {result.health_level_before && result.health_level_after ? (
+                <p>
+                  <span>Level</span>
+                  <strong>
+                    {result.health_level_before} → {result.health_level_after}
+                  </strong>
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+          {result.new_health_warnings.length > 0 ? (
+            <div className="change-block">
+              <h3>Health warnings</h3>
+              {result.new_health_warnings.map((warning) => (
+                <p key={warning}>{warning}</p>
+              ))}
+            </div>
+          ) : null}
           <div className="delta-grid">
             <ChangeBlock title="Attributes" values={result.changed_attributes} />
-            <ChangeBlock title="Health" values={result.changed_health} />
+            <ChangeBlock title="Health deltas" values={result.changed_health} />
             <ChangeBlock title="Assets" values={result.changed_assets} />
           </div>
-          {result.death_reason ? <p className="error-text">Death reason: {result.death_reason}</p> : null}
+          {result.natural_death_candidate_created ? (
+            <p className="muted-text">A natural death candidate was created this year.</p>
+          ) : null}
+          {result.death_reason ? (
+            <p className="error-text">
+              Death reason: {result.death_reason}
+              {result.death_type ? ` (${result.death_type})` : ""}
+            </p>
+          ) : null}
         </>
       ) : (
         <p className="muted-text">Advance a year to receive backend-generated outcomes.</p>
