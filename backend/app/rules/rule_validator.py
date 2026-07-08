@@ -25,6 +25,8 @@ class RuleValidator:
         self._validate_life_stages(rules)
         self._validate_default_attributes(rules)
         self._validate_health_rules(rules)
+        self._validate_education_rules(rules)
+        self._validate_career_rules(rules)
         self._validate_random_events(rules)
         self._validate_inheritance(rules)
 
@@ -63,6 +65,55 @@ class RuleValidator:
 
         if not health_rules.get("disease_pool"):
             raise RuleValidationError("Health rules must include disease_pool.")
+
+    def _validate_education_rules(self, rules: dict) -> None:
+        education = rules.get("education")
+        if not education:
+            raise RuleValidationError("Rule config must include education rules.")
+
+        stages = education.get("stages")
+        if not stages:
+            raise RuleValidationError("Education rules must include stages.")
+
+        for stage in stages:
+            if "min_age" not in stage or "max_age" not in stage:
+                raise RuleValidationError(
+                    f"Education stage '{stage.get('id', 'unknown')}' must include age range."
+                )
+            if int(stage["min_age"]) > int(stage["max_age"]):
+                raise RuleValidationError(
+                    f"Education stage '{stage.get('id', 'unknown')}' has invalid age range."
+                )
+
+    def _validate_career_rules(self, rules: dict) -> None:
+        career = rules.get("career")
+        if not career:
+            raise RuleValidationError("Rule config must include career rules.")
+
+        if "retirement_age" not in career:
+            raise RuleValidationError("Career rules must include retirement_age.")
+
+        paths = career.get("paths")
+        if not paths:
+            raise RuleValidationError("Career rules must include paths.")
+
+        if "education_to_career_mapping" not in career:
+            raise RuleValidationError("Career rules must include education_to_career_mapping.")
+
+        seen_ids: set[str] = set()
+        for path in paths:
+            path_id = str(path.get("id", ""))
+            if not path_id:
+                raise RuleValidationError("Career path must include id.")
+            if path_id in seen_ids:
+                raise RuleValidationError(f"Duplicate career path id detected: {path_id}.")
+            seen_ids.add(path_id)
+            if "base_annual_income" not in path:
+                raise RuleValidationError(f"Career path '{path_id}' must include base_annual_income.")
+            if float(path["base_annual_income"]) < 0:
+                raise RuleValidationError(
+                    f"Career path '{path_id}' base_annual_income cannot be less than 0."
+                )
 
     def _validate_inheritance(self, rules: dict) -> None:
         inheritance = rules.get("inheritance")

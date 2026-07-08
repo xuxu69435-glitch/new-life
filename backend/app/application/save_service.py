@@ -3,6 +3,8 @@ from uuid import uuid4
 from app.engine.simulation_context import LifeState, YearResult
 from app.modules.assets.models import AssetState
 from app.modules.family.rules import build_default_family_state
+from app.modules.education.rules import build_default_education_state
+from app.modules.career.rules import build_default_career_state
 from app.modules.health.rules import build_default_health_state
 
 
@@ -56,8 +58,8 @@ class SaveService:
             attributes=dict(rules.get("default_attributes", {})),
             health=build_default_health_state(rules).to_life_state_dict(),
             family=family_state,
-            education={"track": rules.get("education", {}).get("default_track", "not_started")},
-            career={"title": "none", "income": 0.0},
+            education=build_default_education_state(rules).to_life_state_dict(),
+            career=build_default_career_state(rules).to_life_state_dict(),
             assets=default_assets,
             flags={},
             rule_version=rule_version,

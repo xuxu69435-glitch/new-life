@@ -53,6 +53,36 @@ export function YearResultPanel() {
               ))}
             </div>
           ) : null}
+          {result.education_stage_after ? (
+            <div className="change-block">
+              <h3>Education</h3>
+              <p>
+                <span>Stage</span>
+                <strong>
+                  {result.education_stage_before ?? "n/a"} → {result.education_stage_after}
+                </strong>
+              </p>
+              {result.education_graduated_this_year ? (
+                <p className="muted-text">Graduated this year.</p>
+              ) : null}
+            </div>
+          ) : null}
+          {result.career_status_after ? (
+            <div className="change-block">
+              <h3>Career</h3>
+              <p>
+                <span>Status</span>
+                <strong>
+                  {result.career_status_before ?? "n/a"} → {result.career_status_after}
+                </strong>
+              </p>
+              {result.career_path ? <p>Path: {result.career_path}</p> : null}
+              {result.position_level ? <p>Level: {result.position_level}</p> : null}
+              {result.career_income_change > 0 ? (
+                <p>Annual income: {result.annual_income} (+{result.career_income_change} cash)</p>
+              ) : null}
+            </div>
+          ) : null}
           <div className="delta-grid">
             <ChangeBlock title="Attributes" values={result.changed_attributes} />
             <ChangeBlock title="Health deltas" values={result.changed_health} />

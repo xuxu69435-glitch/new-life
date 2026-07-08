@@ -301,14 +301,121 @@
     }
   },
   "education": {
-    "default_track": "not_started",
-    "placeholder": true,
-    "tracks": []
+    "default_track": "standard",
+    "allow_dropout": false,
+    "stages": [
+      {
+        "id": "preschool",
+        "name": "Preschool",
+        "min_age": 0,
+        "max_age": 5,
+        "graduation_age": 5,
+        "highest_level": "preschool",
+        "annual_attribute_changes": {"intelligence": 1, "charm": 1}
+      },
+      {
+        "id": "primary_school",
+        "name": "Primary School",
+        "min_age": 6,
+        "max_age": 11,
+        "graduation_age": 11,
+        "highest_level": "primary_school",
+        "annual_attribute_changes": {"intelligence": 2, "self_discipline": 1}
+      },
+      {
+        "id": "middle_school",
+        "name": "Middle School",
+        "min_age": 12,
+        "max_age": 14,
+        "graduation_age": 14,
+        "highest_level": "middle_school",
+        "annual_attribute_changes": {"intelligence": 2, "stress_resistance": 1}
+      },
+      {
+        "id": "high_school",
+        "name": "High School",
+        "min_age": 15,
+        "max_age": 17,
+        "graduation_age": 17,
+        "highest_level": "high_school",
+        "annual_attribute_changes": {"intelligence": 3, "self_discipline": 1}
+      },
+      {
+        "id": "college",
+        "name": "College",
+        "min_age": 18,
+        "max_age": 21,
+        "graduation_age": 21,
+        "highest_level": "college",
+        "annual_attribute_changes": {"intelligence": 4, "self_discipline": 2}
+      }
+    ],
+    "none_stage": {
+      "id": "none",
+      "name": "No Formal Education",
+      "min_age": 22,
+      "max_age": 200
+    }
   },
   "career": {
-    "placeholder_income": 1000.0,
-    "placeholder": true,
-    "paths": []
+    "default_path": "general_worker",
+    "min_work_age": 18,
+    "retirement_age": 65,
+    "unemployment_placeholder": true,
+    "paths": [
+      {
+        "id": "general_worker",
+        "name": "General Worker",
+        "min_age": 18,
+        "base_annual_income": 12000,
+        "income_growth_per_year": 200,
+        "position_levels": ["junior", "regular", "senior"],
+        "education_requirement": "none"
+      },
+      {
+        "id": "office_worker",
+        "name": "Office Worker",
+        "min_age": 18,
+        "base_annual_income": 18000,
+        "income_growth_per_year": 400,
+        "position_levels": ["junior", "regular", "senior"],
+        "education_requirement": "high_school"
+      },
+      {
+        "id": "technical_worker",
+        "name": "Technical Worker",
+        "min_age": 18,
+        "base_annual_income": 22000,
+        "income_growth_per_year": 500,
+        "position_levels": ["junior", "regular", "senior"],
+        "education_requirement": "college"
+      },
+      {
+        "id": "freelancer",
+        "name": "Freelancer",
+        "min_age": 18,
+        "base_annual_income": 15000,
+        "income_growth_per_year": 300,
+        "position_levels": ["starter", "established"],
+        "education_requirement": "high_school"
+      }
+    ],
+    "education_to_career_mapping": {
+      "none": ["general_worker"],
+      "preschool": ["general_worker"],
+      "primary_school": ["general_worker"],
+      "middle_school": ["general_worker"],
+      "high_school": ["general_worker", "office_worker", "freelancer"],
+      "college": ["office_worker", "technical_worker", "freelancer"]
+    },
+    "education_income_multiplier": {
+      "none": 0.8,
+      "preschool": 0.8,
+      "primary_school": 0.85,
+      "middle_school": 0.9,
+      "high_school": 1.0,
+      "college": 1.2
+    }
   },
   "family": {
     "placeholder": true,

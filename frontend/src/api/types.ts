@@ -56,6 +56,16 @@ export type YearResult = {
   random_event_health_changes: Record<string, number>;
   random_event_asset_changes: Record<string, number>;
   inheritance_result: InheritanceResult | null;
+  education_stage_before: string | null;
+  education_stage_after: string | null;
+  education_graduated_this_year: boolean;
+  education_changes: Record<string, unknown>;
+  career_status_before: string | null;
+  career_status_after: string | null;
+  career_path: string | null;
+  position_level: string | null;
+  annual_income: number;
+  career_income_change: number;
   occurred_events: SimulationEvent[];
   narrative_text: string;
   next_available_choices: AvailableChoice[];

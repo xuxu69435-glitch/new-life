@@ -8,6 +8,10 @@ from app.infrastructure.rng import ServerRandom
 
 class SimulationEventType(str, Enum):
     ATTRIBUTE_CHANGE_REQUESTED = "AttributeChangeRequested"
+    EDUCATION_PROGRESSED = "EducationProgressed"
+    EDUCATION_STATE_UPDATE_REQUESTED = "EducationStateUpdateRequested"
+    CAREER_PROGRESSED = "CareerProgressed"
+    CAREER_STATE_UPDATE_REQUESTED = "CareerStateUpdateRequested"
     HEALTH_CHANGE_REQUESTED = "HealthChangeRequested"
     HEALTH_WARNING_CREATED = "HealthWarningCreated"
     HEALTH_STATE_UPDATE_REQUESTED = "HealthStateUpdateRequested"
@@ -69,6 +73,16 @@ class YearResult(BaseModel):
     random_event_health_changes: dict[str, int] = Field(default_factory=dict)
     random_event_asset_changes: dict[str, float] = Field(default_factory=dict)
     inheritance_result: dict[str, Any] | None = None
+    education_stage_before: str | None = None
+    education_stage_after: str | None = None
+    education_graduated_this_year: bool = False
+    education_changes: dict[str, Any] = Field(default_factory=dict)
+    career_status_before: str | None = None
+    career_status_after: str | None = None
+    career_path: str | None = None
+    position_level: str | None = None
+    annual_income: float = 0.0
+    career_income_change: float = 0.0
     occurred_events: list[SimulationEvent] = Field(default_factory=list)
     narrative_text: str = ""
     next_available_choices: list[dict[str, Any]] = Field(default_factory=list)

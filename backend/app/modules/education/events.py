@@ -1,1 +1,5 @@
-ALLOWED_EVENTS = ["AttributeChangeRequested", "NarrativeRequested"]
+ALLOWED_EVENTS = [
+    "EducationProgressed",
+    "EducationStateUpdateRequested",
+    "AttributeChangeRequested",
+]

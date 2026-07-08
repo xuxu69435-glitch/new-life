@@ -30,6 +30,17 @@ class ResultCollector:
         self.random_event_attribute_changes: dict[str, int] = {}
         self.random_event_health_changes: dict[str, int] = {}
         self.random_event_asset_changes: dict[str, float] = {}
+        self.education_state_update: dict[str, Any] | None = None
+        self.education_stage_before: str | None = None
+        self.education_stage_after: str | None = None
+        self.education_graduated_this_year: bool = False
+        self.career_state_update: dict[str, Any] | None = None
+        self.career_status_before: str | None = None
+        self.career_status_after: str | None = None
+        self.career_path: str | None = None
+        self.position_level: str | None = None
+        self.annual_income: float = 0.0
+        self.career_income_change: float = 0.0
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -129,6 +140,21 @@ class ResultCollector:
                     self.add_narrative(text)
             elif event.event_type == SimulationEventType.FLAG_SET_REQUESTED:
                 self.changed_flags[str(payload["key"])] = payload.get("value")
+            elif event.event_type == SimulationEventType.EDUCATION_STATE_UPDATE_REQUESTED:
+                self.education_state_update = dict(payload.get("education", {}))
+                self.education_stage_before = payload.get("education_stage_before")
+                self.education_stage_after = payload.get("education_stage_after")
+                self.education_graduated_this_year = bool(
+                    payload.get("education_graduated_this_year", False)
+                )
+            elif event.event_type == SimulationEventType.CAREER_STATE_UPDATE_REQUESTED:
+                self.career_state_update = dict(payload.get("career", {}))
+                self.career_status_before = payload.get("career_status_before")
+                self.career_status_after = payload.get("career_status_after")
+                self.career_path = payload.get("career_path")
+                self.position_level = payload.get("position_level")
+                self.annual_income = float(payload.get("annual_income", 0.0))
+                self.career_income_change = float(payload.get("career_income_change", 0.0))
             elif event.event_type == SimulationEventType.LIFE_STAGE_CHANGED:
                 self.change_life_stage(str(payload["life_stage"]))
 
@@ -169,6 +195,11 @@ class ResultCollector:
         for key, value in self.changed_flags.items():
             next_state.flags[key] = value
 
+        if self.education_state_update is not None:
+            next_state.education = dict(self.education_state_update)
+        if self.career_state_update is not None:
+            next_state.career = dict(self.career_state_update)
+
         if self.death_reason is not None:
             next_state.is_dead = True
             next_state.death_reason = self.death_reason
@@ -208,6 +239,20 @@ class ResultCollector:
             random_event_health_changes=dict(self.random_event_health_changes),
             random_event_asset_changes=dict(self.random_event_asset_changes),
             inheritance_result=self.inheritance_result,
+            education_stage_before=self.education_stage_before,
+            education_stage_after=self.education_stage_after,
+            education_graduated_this_year=self.education_graduated_this_year,
+            education_changes={
+                "stage_before": self.education_stage_before,
+                "stage_after": self.education_stage_after,
+                "graduated": self.education_graduated_this_year,
+            },
+            career_status_before=self.career_status_before,
+            career_status_after=self.career_status_after,
+            career_path=self.career_path,
+            position_level=self.position_level,
+            annual_income=self.annual_income,
+            career_income_change=self.career_income_change,
             occurred_events=occurred_events,
             narrative_text="\n".join(self.narrative_lines),
             next_available_choices=next_available_choices,

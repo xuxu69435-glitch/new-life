@@ -1,1 +1,5 @@
-ALLOWED_EVENTS = ["IncomeChangeRequested"]
+ALLOWED_EVENTS = [
+    "CareerProgressed",
+    "CareerStateUpdateRequested",
+    "AssetChangeRequested",
+]

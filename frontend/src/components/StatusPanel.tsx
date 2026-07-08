@@ -87,6 +87,26 @@ export function StatusPanel({ state }: StatusPanelProps) {
         </>
       ) : null}
 
+      <h3>Education</h3>
+      <div className="metric-grid">
+        {entries(state.education).map((item) => (
+          <div className="metric" key={item.key}>
+            <span>{item.key}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+
+      <h3>Career</h3>
+      <div className="metric-grid">
+        {entries(state.career).map((item) => (
+          <div className="metric" key={item.key}>
+            <span>{item.key}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+
       <h3>Assets</h3>
       <div className="metric-grid">
         {entries(state.assets).map((item) => (
