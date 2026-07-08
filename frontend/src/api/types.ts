@@ -262,6 +262,31 @@ export type PendingRandomEventResponse = {
   pending_random_event: Record<string, unknown> | null;
 };
 
+export type PendingLegalChoice = {
+  choice_id: string;
+  label: string;
+  choice_text: string;
+  implementation_status?: string;
+};
+
+export type PendingLegalEvent = {
+  name?: string;
+  event_text?: string;
+  choices?: PendingLegalChoice[];
+};
+
+export type PendingRandomEventChoice = {
+  choice_id: string;
+  label: string;
+  choice_text: string;
+};
+
+export type PendingRandomEventPayload = {
+  name?: string;
+  event_text?: string;
+  choices: PendingRandomEventChoice[];
+};
+
 export type LegalStatePayload = {
   is_in_prison: boolean;
   sentence_total_years: number;

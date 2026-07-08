@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { apiClient } from "../api/client";
+import type { PendingRandomEventPayload } from "../api/types";
 
 type RandomEventPanelProps = {
   lifeId: string;
@@ -23,7 +24,7 @@ export function RandomEventPanel({ lifeId, disabled = false }: RandomEventPanelP
     },
   });
 
-  const pending = pendingQuery.data?.pending_random_event;
+  const pending = pendingQuery.data?.pending_random_event as PendingRandomEventPayload | null | undefined;
   if (!pending) {
     return null;
   }

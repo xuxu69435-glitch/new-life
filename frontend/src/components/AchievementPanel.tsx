@@ -42,7 +42,7 @@ export function AchievementPanel({ lifeId, disabled = false }: AchievementPanelP
           ))}
         </div>
       ) : null}
-      {data.achievements?.milestones?.length ? (
+      {Array.isArray(data.achievements?.milestones) && data.achievements.milestones.length > 0 ? (
         <div className="change-block">
           <h3>里程碑</h3>
           {(data.achievements.milestones as Array<Record<string, unknown>>).slice(-5).map((item) => (

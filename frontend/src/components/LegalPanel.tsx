@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { apiClient } from "../api/client";
+import type { PendingLegalEvent } from "../api/types";
 
 type LegalPanelProps = {
   lifeId: string;
@@ -24,8 +25,8 @@ export function LegalPanel({ lifeId, disabled = false }: LegalPanelProps) {
   });
 
   const legal = legalQuery.data?.legal;
-  const pending = legalQuery.data?.pending_legal_event;
-  const restrictions = legalQuery.data?.restrictions;
+  const pending = legalQuery.data?.pending_legal_event as PendingLegalEvent | null | undefined;
+  const restrictions = legalQuery.data?.restrictions as Record<string, unknown> | undefined;
 
   if (!legal && !pending) {
     return null;
@@ -64,7 +65,7 @@ export function LegalPanel({ lifeId, disabled = false }: LegalPanelProps) {
       ) : null}
       {restrictions ? (
         <p className="muted-text">
-          就业惩罚率：{Math.round((restrictions.employment_penalty_rate ?? 0) * 100)}%
+          就业惩罚率：{Math.round(Number(restrictions.employment_penalty_rate ?? 0) * 100)}%
         </p>
       ) : null}
       {pending ? (
@@ -72,8 +73,8 @@ export function LegalPanel({ lifeId, disabled = false }: LegalPanelProps) {
           <h3>{pending.name}</h3>
           <p className="narrative-text">{pending.event_text}</p>
           <div className="choice-list">
-            {pending.choices
-              ?.filter((choice) => choice.implementation_status !== "planned")
+            {(pending.choices ?? [])
+              .filter((choice) => choice.implementation_status !== "planned")
               .map((choice) => (
                 <button
                   key={choice.choice_id}

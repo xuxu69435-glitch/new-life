@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.api.achievement_api import router as achievement_router
 from app.api.family_api import router as family_router
@@ -20,7 +21,7 @@ app = FastAPI(title="Text Life Simulation API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=settings.cors_origin_list(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,6 +50,39 @@ def validate_default_rules_on_startup() -> None:
         init_database(create_tables=True)
 
 
+def _check_rules_loaded() -> bool:
+    try:
+        loader = RuleLoader()
+        loader.version_manager.ensure_default_available()
+        loader.load_default()
+        return True
+    except Exception:
+        return False
+
+
+def _check_database_connected() -> bool:
+    if settings.save_repository_type != "postgres":
+        return True
+    try:
+        from app.infrastructure.save.db import get_engine
+
+        with get_engine().connect() as connection:
+            connection.execute(text("SELECT 1"))
+        return True
+    except Exception:
+        return False
+
+
 @app.get("/health")
-def health_check() -> dict[str, str]:
-    return {"status": "ok"}
+def health_check() -> dict[str, str | bool]:
+    rules_loaded = _check_rules_loaded()
+    database_connected = _check_database_connected()
+    healthy = rules_loaded and database_connected
+    return {
+        "status": "ok" if healthy else "degraded",
+        "environment": settings.environment,
+        "repository_type": settings.save_repository_type,
+        "rules_loaded": rules_loaded,
+        "database_connected": database_connected,
+        "default_rule_version": settings.default_rule_version,
+    }

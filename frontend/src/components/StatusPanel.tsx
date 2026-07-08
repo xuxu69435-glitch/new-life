@@ -68,7 +68,7 @@ export function StatusPanel({ state }: StatusPanelProps) {
           </div>
         ) : null}
         {entries(state.health)
-          .filter(([key]) => !["health_score", "health_level", "diseases", "warnings"].includes(key))
+          .filter((item) => !["health_score", "health_level", "diseases", "warnings"].includes(item.key))
           .map((item) => (
             <div className="metric" key={item.key}>
               <span>{item.key}</span>

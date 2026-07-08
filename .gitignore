@@ -4,6 +4,10 @@
 ARCHITECTURE.md
 MODULE_CONTRACTS.md
 
+# Local deployment tools (not committed)
+backend/scripts/*
+!backend/scripts/init_db.py
+
 # Python
 __pycache__/
 .pytest_cache/

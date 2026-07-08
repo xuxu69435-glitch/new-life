@@ -19,9 +19,12 @@ export function MainlinePanel({ lifeId, disabled = false }: MainlinePanelProps) 
     return null;
   }
 
-  const mainline = data.mainline;
+  const mainline = data.mainline as Record<string, unknown>;
+  const completedTasks = Array.isArray(mainline.completed_tasks)
+    ? (mainline.completed_tasks as string[])
+    : [];
   const activeTasks = data.active_tasks ?? [];
-  const hasContent = activeTasks.length > 0 || mainline?.completed_tasks?.length > 0;
+  const hasContent = activeTasks.length > 0 || completedTasks.length > 0;
 
   if (!hasContent && !data.current_guidance_text) {
     return null;
@@ -32,7 +35,7 @@ export function MainlinePanel({ lifeId, disabled = false }: MainlinePanelProps) 
       <p className="eyebrow">Mainline goals</p>
       <h2>主线任务</h2>
       <p className="muted-text">
-        当前阶段：{mainline?.current_chapter ?? "-"} / {mainline?.current_stage ?? "-"}
+        当前阶段：{String(mainline.current_chapter ?? "-")} / {String(mainline.current_stage ?? "-")}
       </p>
       {data.current_guidance_text ? (
         <p className="narrative-text">{data.current_guidance_text}</p>
@@ -50,8 +53,8 @@ export function MainlinePanel({ lifeId, disabled = false }: MainlinePanelProps) 
       ) : (
         <p className="muted-text">当前没有进行中的主线任务。</p>
       )}
-      {mainline?.completed_tasks?.length ? (
-        <p className="muted-text">已完成：{mainline.completed_tasks.join("、")}</p>
+      {completedTasks.length > 0 ? (
+        <p className="muted-text">已完成：{completedTasks.join("、")}</p>
       ) : null}
     </section>
   );
