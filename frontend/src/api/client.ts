@@ -1,5 +1,6 @@
 import type {
   InheritanceResult,
+  AchievementStateResponse,
   LegalChoiceResponse,
   LegalStateResponse,
   LifeStateResponse,
@@ -72,6 +73,10 @@ export const apiClient = {
 
   getMainlineState(lifeId: string): Promise<MainlineStateResponse> {
     return request<MainlineStateResponse>(`/games/${lifeId}/mainline-state`);
+  },
+
+  getAchievementState(lifeId: string): Promise<AchievementStateResponse> {
+    return request<AchievementStateResponse>(`/games/${lifeId}/achievement-state`);
   },
 
   getTimeline(lifeId: string): Promise<YearResult[]> {

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { apiClient } from "../api/client";
 import { useGameStore } from "../store/gameStore";
+import { AchievementPanel } from "./AchievementPanel";
 import { AnnualNarrativeFromStore } from "./AnnualNarrativePanel";
 import { ChoicePanel } from "./ChoicePanel";
 import { FamilyPanel } from "./FamilyPanel";
@@ -74,6 +75,7 @@ export function LifeDashboard({ onExit }: LifeDashboardProps) {
             <TimelinePanel lifeId={lifeId} />
           </section>
           <aside className="side-column">
+            <AchievementPanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
             <FamilyPanel lifeId={lifeId} />
             <InheritancePanel lifeId={lifeId} />
           </aside>

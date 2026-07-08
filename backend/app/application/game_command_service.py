@@ -225,6 +225,11 @@ class GameCommandService:
             "status": "continued",
         }
         self.save_service.save_heir_continuation(life_id, record)
+        from app.modules.achievement.service import AchievementService
+
+        parent_state = self.save_service.get_life_state(life_id)
+        updated_parent = AchievementService().unlock_heir_continuation_for_life(parent_state, rules)
+        self.save_service.save_life_state(updated_parent)
         choices = self.engine.get_available_choices(new_state, rules)
         return {
             **record,

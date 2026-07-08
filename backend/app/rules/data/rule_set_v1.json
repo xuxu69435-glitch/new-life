@@ -512,6 +512,11 @@
     "narrative_version": "v1",
     "templates_file": "narrative_templates_v1.json"
   },
+  "achievements": {
+    "use_achievement_v1": true,
+    "achievement_version": "v1",
+    "library_file": "achievement_library_v1.json"
+  },
   "narrative_templates": {
     "placeholder": false,
     "version": "v1"

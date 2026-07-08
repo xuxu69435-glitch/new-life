@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.achievement_api import router as achievement_router
 from app.api.family_api import router as family_router
 from app.api.game_api import router as game_router
 from app.api.inheritance_api import router as inheritance_router
@@ -30,6 +31,7 @@ app.include_router(family_router)
 app.include_router(inheritance_router)
 app.include_router(legal_router)
 app.include_router(mainline_router)
+app.include_router(achievement_router)
 if settings.enable_dev_routes:
     app.include_router(legal_dev_router)
 include_dev_rules_router(app)

@@ -42,6 +42,7 @@ class SimulationEventType(str, Enum):
     LEGAL_EVENT_TRIGGERED = "LegalEventTriggered"
     LEGAL_CHOICE_APPLIED = "LegalChoiceApplied"
     MAINLINE_STATE_UPDATE_REQUESTED = "MainlineStateUpdateRequested"
+    ACHIEVEMENT_STATE_UPDATE_REQUESTED = "AchievementStateUpdateRequested"
 
 
 class LifeState(BaseModel):
@@ -62,6 +63,7 @@ class LifeState(BaseModel):
     legal: dict[str, Any] = Field(default_factory=dict)
     pending_legal_event: dict[str, Any] | None = None
     mainline: dict[str, Any] = Field(default_factory=dict)
+    achievements: dict[str, Any] = Field(default_factory=dict)
     rule_version: str = "v1"
 
 
@@ -134,6 +136,10 @@ class YearResult(BaseModel):
     annual_summary_text: str = ""
     major_event_texts: list[str] = Field(default_factory=list)
     display_sections: list[dict[str, Any]] = Field(default_factory=list)
+    newly_unlocked_achievements: list[dict[str, Any]] = Field(default_factory=list)
+    achievement_points_gained: int = 0
+    milestones_this_year: list[dict[str, Any]] = Field(default_factory=list)
+    achievement_narrative: list[str] = Field(default_factory=list)
 
 
 class SimulationContext(BaseModel):

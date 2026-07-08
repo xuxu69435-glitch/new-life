@@ -98,6 +98,16 @@ export type YearResult = {
   mainline_rewards: Record<string, unknown>[];
   mainline_narrative: string[];
   current_guidance_text: string;
+  newly_unlocked_achievements: Array<{
+    achievement_id: string;
+    title: string;
+    description: string;
+    points_gained: number;
+    narrative_text?: string;
+  }>;
+  achievement_points_gained: number;
+  milestones_this_year: Array<Record<string, unknown>>;
+  achievement_narrative: string[];
 };
 
 export type HeirShare = {
@@ -151,6 +161,23 @@ export type MainlineStateResponse = {
   mainline: Record<string, unknown>;
   active_tasks: MainlineTaskSummary[];
   current_guidance_text: string;
+};
+
+export type AchievementStateResponse = {
+  life_id: string;
+  achievements: Record<string, unknown>;
+  achievement_list: Array<{
+    achievement_id: string;
+    title: string;
+    description: string;
+    category: string;
+    tier: string;
+    points?: number;
+    hidden: boolean;
+    unlocked: boolean;
+  }>;
+  total_points: number;
+  unlocked_count: number;
 };
 
 export type LifeStateResponse = {

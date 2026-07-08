@@ -4,6 +4,7 @@ from app.engine.simulation_context import LifeState, SimulationEvent, Simulation
 from app.modules.family.events import FamilyEventProcessor
 from app.modules.family.models import FamilyState
 from app.modules.health.sync import apply_post_health_changes
+from app.modules.achievement.models import AchievementState
 from app.modules.legal.models import LegalState
 from app.modules.mainline.models import MainlineState
 
@@ -64,6 +65,12 @@ class ResultCollector:
         self.mainline_narrative: list[str] = []
         self.current_guidance_text: str = ""
         self.narrative_result: dict[str, Any] | None = None
+        self._achievement_working: AchievementState | None = None
+        self.achievement_changes: dict[str, Any] = {}
+        self.newly_unlocked_achievements: list[dict[str, Any]] = []
+        self.achievement_points_gained: int = 0
+        self.milestones_this_year: list[dict[str, Any]] = []
+        self.achievement_narrative: list[str] = []
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -131,6 +138,10 @@ class ResultCollector:
         if self._mainline_working is None:
             self._mainline_working = MainlineState.from_life_state_dict(state.mainline)
 
+    def bind_achievement_context(self, state: LifeState) -> None:
+        if self._achievement_working is None:
+            self._achievement_working = AchievementState.from_life_state_dict(state.achievements)
+
     def snapshot_state(self, state: LifeState, rules: dict | None = None) -> LifeState:
         snapshot = state.model_copy(deep=True)
         snapshot.age += 1
@@ -170,6 +181,13 @@ class ResultCollector:
             snapshot.family = self._family_working.to_life_state_dict()
         if self._legal_working is not None:
             snapshot.legal = self._legal_working.to_life_state_dict()
+        if self._mainline_working is not None:
+            snapshot.mainline = self._mainline_working.to_life_state_dict()
+        if self._achievement_working is not None:
+            snapshot.achievements = self._achievement_working.to_life_state_dict()
+        if self.death_reason is not None:
+            snapshot.is_dead = True
+            snapshot.death_reason = self.death_reason
         return snapshot
 
     def collect_from_events(self, events: list[SimulationEvent]) -> None:
@@ -271,6 +289,16 @@ class ResultCollector:
                 self.mainline_narrative = list(payload.get("mainline_narrative", []))
                 if self._mainline_working is not None:
                     self.current_guidance_text = self._mainline_working.current_guidance_text
+            elif event.event_type == SimulationEventType.ACHIEVEMENT_STATE_UPDATE_REQUESTED:
+                patch = dict(payload.get("achievement", {}))
+                if self._achievement_working is not None and patch:
+                    merged = {**self._achievement_working.to_life_state_dict(), **patch}
+                    self._achievement_working = AchievementState.from_life_state_dict(merged)
+                    self.achievement_changes = merged
+                self.newly_unlocked_achievements = list(payload.get("newly_unlocked", []))
+                self.achievement_points_gained = int(payload.get("achievement_points_gained", 0))
+                self.milestones_this_year = list(payload.get("milestones_this_year", []))
+                self.achievement_narrative = list(payload.get("achievement_narrative", []))
             elif event.event_type in {
                 SimulationEventType.FAMILY_RELATION_CHANGE_REQUESTED,
                 SimulationEventType.FAMILY_STATE_UPDATE_REQUESTED,
@@ -366,6 +394,9 @@ class ResultCollector:
 
         if self._mainline_working is not None:
             next_state.mainline = self._mainline_working.to_life_state_dict()
+
+        if self._achievement_working is not None:
+            next_state.achievements = self._achievement_working.to_life_state_dict()
 
         if self.death_reason is not None:
             next_state.is_dead = True
@@ -479,4 +510,8 @@ class ResultCollector:
                 if self.narrative_result
                 else []
             ),
+            newly_unlocked_achievements=list(self.newly_unlocked_achievements),
+            achievement_points_gained=self.achievement_points_gained,
+            milestones_this_year=list(self.milestones_this_year),
+            achievement_narrative=list(self.achievement_narrative),
         )

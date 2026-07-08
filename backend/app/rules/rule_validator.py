@@ -33,6 +33,7 @@ class RuleValidator:
         self._validate_legal_rules(rules)
         self._validate_mainline_rules(rules)
         self._validate_narrative_rules(rules)
+        self._validate_achievement_rules(rules)
         self._validate_random_events(rules)
         self._validate_inheritance(rules)
 
@@ -213,6 +214,17 @@ class RuleValidator:
             for group in required_groups:
                 if group not in templates:
                     raise RuleValidationError(f"Narrative templates must include {group}.")
+
+    def _validate_achievement_rules(self, rules: dict) -> None:
+        achievements = rules.get("achievements")
+        if not achievements:
+            raise RuleValidationError("Rule config must include achievements rules.")
+        if achievements.get("use_achievement_v1", False):
+            from app.rules.achievement_library_loader import AchievementLibraryLoader
+            from app.rules.achievement_validator import AchievementValidator
+
+            library = AchievementLibraryLoader().load()
+            AchievementValidator().validate_library(library)
 
     def _validate_inheritance(self, rules: dict) -> None:
         inheritance = rules.get("inheritance")
