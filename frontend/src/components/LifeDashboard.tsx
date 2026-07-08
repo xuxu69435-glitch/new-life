@@ -7,6 +7,7 @@ import { useGameStore } from "../store/gameStore";
 import { ChoicePanel } from "./ChoicePanel";
 import { FamilyPanel } from "./FamilyPanel";
 import { InheritancePanel } from "./InheritancePanel";
+import { RandomEventPanel } from "./RandomEventPanel";
 import { StatusPanel } from "./StatusPanel";
 import { TimelinePanel } from "./TimelinePanel";
 import { YearResultPanel } from "./YearResultPanel";
@@ -62,6 +63,7 @@ export function LifeDashboard({ onExit }: LifeDashboardProps) {
           <StatusPanel state={lifeQuery.data.state} />
           <section className="main-column">
             <ChoicePanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
+            <RandomEventPanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
             <YearResultPanel />
             <TimelinePanel lifeId={lifeId} />
           </section>

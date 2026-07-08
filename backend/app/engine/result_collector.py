@@ -41,6 +41,9 @@ class ResultCollector:
         self.position_level: str | None = None
         self.annual_income: float = 0.0
         self.career_income_change: float = 0.0
+        self.pending_random_event: dict[str, Any] | None = None
+        self.unsupported_random_event_effects: list[dict[str, Any]] = []
+        self.random_event_choice_result: dict[str, Any] | None = None
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -157,6 +160,10 @@ class ResultCollector:
                 self.career_income_change = float(payload.get("career_income_change", 0.0))
             elif event.event_type == SimulationEventType.LIFE_STAGE_CHANGED:
                 self.change_life_stage(str(payload["life_stage"]))
+            elif event.event_type == SimulationEventType.UNSUPPORTED_EFFECT_RECORDED:
+                self.unsupported_random_event_effects.append(dict(payload))
+            elif event.event_type == SimulationEventType.RANDOM_EVENT_CHOICE_APPLIED:
+                self.random_event_choice_result = dict(payload)
 
     def apply_to_state(self, state: LifeState, rules: dict | None = None) -> LifeState:
         next_state = state.model_copy(deep=True)
@@ -203,6 +210,11 @@ class ResultCollector:
         if self.death_reason is not None:
             next_state.is_dead = True
             next_state.death_reason = self.death_reason
+
+        if self.pending_random_event is not None:
+            next_state.pending_random_event = dict(self.pending_random_event)
+        if self.random_event_choice_result is not None:
+            next_state.pending_random_event = None
         return next_state
 
     def to_year_result(
@@ -256,4 +268,7 @@ class ResultCollector:
             occurred_events=occurred_events,
             narrative_text="\n".join(self.narrative_lines),
             next_available_choices=next_available_choices,
+            pending_random_event=self.pending_random_event or after.pending_random_event,
+            unsupported_random_event_effects=list(self.unsupported_random_event_effects),
+            random_event_choice_result=self.random_event_choice_result,
         )

@@ -12,6 +12,7 @@ export type LifeState = {
   career: Record<string, unknown>;
   assets: Record<string, number>;
   flags: Record<string, unknown>;
+  pending_random_event: Record<string, unknown> | null;
   rule_version: string;
 };
 
@@ -69,6 +70,9 @@ export type YearResult = {
   occurred_events: SimulationEvent[];
   narrative_text: string;
   next_available_choices: AvailableChoice[];
+  pending_random_event: Record<string, unknown> | null;
+  unsupported_random_event_effects: Record<string, unknown>[];
+  random_event_choice_result: Record<string, unknown> | null;
 };
 
 export type HeirShare = {
@@ -111,4 +115,21 @@ export type PlayableHeirsResponse = {
 export type LifeStateResponse = {
   state: LifeState;
   available_choices: AvailableChoice[];
+};
+
+export type RandomEventChoiceResponse = {
+  life_id: string;
+  choice_result: {
+    event_id: string;
+    choice_id: string;
+    choice_text: string;
+    effects_text: string;
+  };
+  pending_random_event: Record<string, unknown> | null;
+  state: LifeState;
+};
+
+export type PendingRandomEventResponse = {
+  life_id: string;
+  pending_random_event: Record<string, unknown> | null;
 };

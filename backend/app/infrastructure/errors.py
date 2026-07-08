@@ -20,3 +20,7 @@ class RuleValidationError(DomainError):
 
 class RandomEventEffectError(DomainError):
     """Raised when a random event effect cannot be parsed or applied."""
+
+
+class PendingRandomEventError(DomainError):
+    """Raised when year advance is blocked by an unresolved random event."""

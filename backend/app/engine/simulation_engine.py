@@ -4,7 +4,7 @@ from app.engine.event_bus import EventBus
 from app.engine.module_runner import SimulationModule
 from app.engine.result_collector import ResultCollector
 from app.engine.simulation_context import LifeState, SimulationContext, YearResult
-from app.infrastructure.errors import InvalidPlayerChoiceError, LifeAlreadyEndedError
+from app.infrastructure.errors import InvalidPlayerChoiceError, LifeAlreadyEndedError, PendingRandomEventError
 from app.infrastructure.rng import ServerRandom
 from app.modules.assets.service import AssetsService
 from app.modules.attributes.service import AttributesService
@@ -44,6 +44,10 @@ class SimulationEngine:
     ) -> tuple[LifeState, YearResult, dict[str, Any] | None]:
         if current_state.is_dead:
             raise LifeAlreadyEndedError("Cannot advance a dead life.")
+        if current_state.pending_random_event is not None:
+            raise PendingRandomEventError(
+                "Cannot advance year until the pending random event choice is submitted."
+            )
 
         choices = dict(player_choices or {})
         choices.setdefault("annual_focus", "balanced_year")
@@ -78,6 +82,43 @@ class SimulationEngine:
             next_available_choices=next_choices,
         )
         return next_state, result, context.result_collector.inheritance_result
+
+    def submit_random_event_choice(
+        self,
+        current_state: LifeState,
+        choice_id: str,
+        rules: dict,
+    ) -> tuple[LifeState, dict[str, Any]]:
+        if current_state.is_dead:
+            raise LifeAlreadyEndedError("Cannot resolve choices for a dead life.")
+        if current_state.pending_random_event is None:
+            raise InvalidPlayerChoiceError("No pending random event is available.")
+
+        context = SimulationContext(
+            state=current_state,
+            player_choices={"annual_focus": "balanced_year"},
+            rule_version=current_state.rule_version,
+            rng=ServerRandom(self.rng_seed),
+            event_bus=EventBus(),
+            result_collector=ResultCollector(),
+            rules=rules,
+        )
+
+        random_events_module = RandomEventsService()
+        choice_result = random_events_module.submit_choice(context, choice_id)
+        context.result_collector.collect_from_events(context.event_bus.all())
+
+        death_module = DeathService()
+        death_module.run(context)
+        context.result_collector.collect_from_events(context.event_bus.all())
+
+        if context.result_collector.death_confirmed:
+            self.inheritance_module.run(context)
+            context.result_collector.collect_from_events(context.event_bus.all())
+
+        next_state = context.result_collector.apply_to_state(current_state, rules)
+        next_state.pending_random_event = None
+        return next_state, choice_result
 
     def get_available_choices(self, state: LifeState, rules: dict) -> list[dict[str, Any]]:
         choices = rules.get("available_choices", {})

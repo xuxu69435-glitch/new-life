@@ -25,6 +25,8 @@ class SimulationEventType(str, Enum):
     FLAG_SET_REQUESTED = "FlagSetRequested"
     LIFE_STAGE_CHANGED = "LifeStageChanged"
     ASSET_CHANGE_REQUESTED = "AssetChangeRequested"
+    UNSUPPORTED_EFFECT_RECORDED = "UnsupportedEffectRecorded"
+    RANDOM_EVENT_CHOICE_APPLIED = "RandomEventChoiceApplied"
 
 
 class LifeState(BaseModel):
@@ -41,6 +43,7 @@ class LifeState(BaseModel):
     career: dict[str, Any] = Field(default_factory=dict)
     assets: dict[str, Any] = Field(default_factory=dict)
     flags: dict[str, Any] = Field(default_factory=dict)
+    pending_random_event: dict[str, Any] | None = None
     rule_version: str = "v1"
 
 
@@ -86,6 +89,9 @@ class YearResult(BaseModel):
     occurred_events: list[SimulationEvent] = Field(default_factory=list)
     narrative_text: str = ""
     next_available_choices: list[dict[str, Any]] = Field(default_factory=list)
+    pending_random_event: dict[str, Any] | None = None
+    unsupported_random_event_effects: list[dict[str, Any]] = Field(default_factory=list)
+    random_event_choice_result: dict[str, Any] | None = None
 
 
 class SimulationContext(BaseModel):

@@ -48,6 +48,26 @@ class GameCommandService:
     def advance_one_year(self, life_id: str, player_choices: dict[str, Any]) -> YearResult:
         return self.life_progress.advance_one_year(life_id, player_choices)
 
+    def get_pending_random_event(self, life_id: str) -> dict[str, Any] | None:
+        state = self.save_service.get_life_state(life_id)
+        return state.pending_random_event
+
+    def submit_random_event_choice(self, life_id: str, choice_id: str) -> dict[str, Any]:
+        state = self.save_service.get_life_state(life_id)
+        rules = self.rule_loader.load(state.rule_version)
+        next_state, choice_result = self.engine.submit_random_event_choice(
+            state,
+            choice_id,
+            rules,
+        )
+        self.save_service.save_life_state(next_state)
+        return {
+            "life_id": life_id,
+            "choice_result": choice_result,
+            "pending_random_event": next_state.pending_random_event,
+            "state": next_state,
+        }
+
     def get_timeline(self, life_id: str) -> list[YearResult]:
         return self.save_service.get_timeline(life_id)
 

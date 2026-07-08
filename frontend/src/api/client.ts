@@ -1,4 +1,11 @@
-import type { InheritanceResult, LifeStateResponse, PlayableHeirsResponse, YearResult } from "./types";
+import type {
+  InheritanceResult,
+  LifeStateResponse,
+  PendingRandomEventResponse,
+  PlayableHeirsResponse,
+  RandomEventChoiceResponse,
+  YearResult,
+} from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -35,6 +42,17 @@ export const apiClient = {
     return request<YearResult>(`/games/${lifeId}/advance`, {
       method: "POST",
       body: JSON.stringify({ player_choices: { annual_focus: annualFocus } }),
+    });
+  },
+
+  getPendingRandomEvent(lifeId: string): Promise<PendingRandomEventResponse> {
+    return request<PendingRandomEventResponse>(`/games/${lifeId}/pending-random-event`);
+  },
+
+  submitRandomEventChoice(lifeId: string, choiceId: string): Promise<RandomEventChoiceResponse> {
+    return request<RandomEventChoiceResponse>(`/games/${lifeId}/random-event-choice`, {
+      method: "POST",
+      body: JSON.stringify({ choice_id: choiceId }),
     });
   },
 

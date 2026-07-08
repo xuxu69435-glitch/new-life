@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "random_event_library_v1.schema.json",
+  "title": "Random Event Library V1",
+  "type": "object",
+  "required": ["version", "event_count", "events"],
+  "properties": {
+    "version": { "type": "string" },
+    "source": { "type": "string" },
+    "event_count": { "const": 80 },
+    "events": {
+      "type": "array",
+      "minItems": 80,
+      "maxItems": 80,
+      "items": { "$ref": "#/$defs/event" }
+    }
+  },
+  "$defs": {
+    "age_range": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "integer" },
+        "max": { "type": "integer" }
+      }
+    },
+    "choice": {
+      "type": "object",
+      "required": [
+        "choice_id",
+        "label",
+        "choice_text",
+        "effects_text",
+        "effects",
+        "requires_confirmation",
+        "is_system_choice"
+      ],
+      "properties": {
+        "choice_id": { "type": "string" },
+        "label": { "type": "string" },
+        "choice_text": { "type": "string" },
+        "effects_text": { "type": "string", "minLength": 1 },
+        "effects": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/effect" }
+        },
+        "requires_confirmation": { "type": "boolean" },
+        "is_system_choice": { "type": "boolean" }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": [
+            "attribute_change",
+            "health_change",
+            "asset_change",
+            "direct_death_candidate",
+            "narrative_tag",
+            "flag_set",
+            "unsupported_effect"
+          ]
+        },
+        "target": { "type": "string" },
+        "value": {},
+        "reason": { "type": "string" }
+      }
+    },
+    "conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_age": { "type": "integer" },
+        "max_age": { "type": "integer" },
+        "age_equals": { "type": "integer" },
+        "life_stages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "health_below": { "type": "integer" },
+        "health_above": { "type": "integer" },
+        "asset_below": { "type": "number" },
+        "asset_above": { "type": "number" },
+        "education_stage_in": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "highest_level_in": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "employment_status_in": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "career_path_in": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "has_flag": { "type": "string" },
+        "not_has_flag": { "type": "string" },
+        "attribute_below": { "type": "object" },
+        "attribute_above": { "type": "object" },
+        "family_state": { "type": "string" },
+        "relationship_state": { "type": "string" },
+        "system_only": { "type": "boolean" },
+        "unsupported_condition": { "type": "string" },
+        "pool": { "type": "string" }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "name",
+        "category",
+        "age_range",
+        "life_stages",
+        "trigger_conditions_text",
+        "conditions",
+        "weight_tier",
+        "weight",
+        "repeat_policy",
+        "event_text",
+        "choices",
+        "may_cause_death",
+        "affects_future",
+        "implementation_status",
+        "unsupported_reasons",
+        "source_text",
+        "pool_type"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "pattern": "^E0[0-7][0-9]$|^E080$"
+        },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "age_range": { "$ref": "#/$defs/age_range" },
+        "life_stages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "trigger_conditions_text": { "type": "string" },
+        "conditions": { "$ref": "#/$defs/conditions" },
+        "weight_tier": {
+          "enum": ["低概率", "中低概率", "中概率", "中高概率", "高概率", "极低概率", "系统事件"]
+        },
+        "weight": { "type": "integer" },
+        "repeat_policy": {
+          "enum": ["once", "repeatable", "max_once"]
+        },
+        "cooldown_years": {
+          "type": ["integer", "null"]
+        },
+        "event_text": { "type": "string", "minLength": 1 },
+        "choices": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/choice" }
+        },
+        "may_cause_death": { "type": "boolean" },
+        "affects_future": { "type": "boolean" },
+        "implementation_status": {
+          "enum": ["active", "partial", "planned"]
+        },
+        "unsupported_reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source_text": { "type": "string" },
+        "pool_type": {
+          "enum": ["normal", "direct_death", "system"]
+        }
+      }
+    }
+  }
+}

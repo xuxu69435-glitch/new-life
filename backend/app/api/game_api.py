@@ -18,6 +18,17 @@ class AdvanceYearRequest(BaseModel):
     player_choices: dict[str, Any] = Field(default_factory=dict)
 
 
+class SubmitRandomEventChoiceRequest(BaseModel):
+    choice_id: str
+
+
+class RandomEventChoiceResponse(BaseModel):
+    life_id: str
+    choice_result: dict[str, Any]
+    pending_random_event: dict[str, Any] | None
+    state: LifeState
+
+
 class LifeStateResponse(BaseModel):
     state: LifeState
     available_choices: list[dict[str, Any]]
@@ -49,3 +60,26 @@ def advance_one_year(life_id: str, request: AdvanceYearRequest) -> YearResult:
         raise HTTPException(status_code=404, detail="Life not found") from exc
     except DomainError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/{life_id}/pending-random-event")
+def get_pending_random_event(life_id: str) -> dict[str, Any]:
+    try:
+        pending = game_service.get_pending_random_event(life_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Life not found") from exc
+    return {"life_id": life_id, "pending_random_event": pending}
+
+
+@router.post("/{life_id}/random-event-choice", response_model=RandomEventChoiceResponse)
+def submit_random_event_choice(
+    life_id: str,
+    request: SubmitRandomEventChoiceRequest,
+) -> RandomEventChoiceResponse:
+    try:
+        payload = game_service.submit_random_event_choice(life_id, request.choice_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Life not found") from exc
+    except DomainError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return RandomEventChoiceResponse(**payload)

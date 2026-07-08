@@ -121,6 +121,8 @@
   },
   "random_events": {
     "direct_death_probability_limit": 0.03,
+    "use_v1_library": false,
+    "v1_library_file": "random_event_library_v1.json",
     "event_pool": [
       {
         "id": "infant_growth_milestone",

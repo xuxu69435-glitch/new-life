@@ -10,6 +10,15 @@ export function YearResultPanel() {
       {result ? (
         <>
           <p className="narrative-text">{result.narrative_text}</p>
+          {result.pending_random_event ? (
+            <div className="change-block">
+              <h3>Pending random event</h3>
+              <p>
+                <strong>{String(result.pending_random_event.name)}</strong>
+              </p>
+              <p className="muted-text">{String(result.pending_random_event.event_text)}</p>
+            </div>
+          ) : null}
           {result.triggered_random_events.length > 0 ? (
             <div className="change-block">
               <h3>Random events</h3>
