@@ -1,4 +1,6 @@
 from app.infrastructure.errors import RuleValidationError
+from app.rules.mainline_task_validator import MainlineTaskValidator
+from app.rules.mainline_task_library_loader import MainlineTaskLibraryLoader
 from app.rules.models import RandomEventRule
 
 
@@ -29,6 +31,8 @@ class RuleValidator:
         self._validate_career_rules(rules)
         self._validate_family_rules(rules)
         self._validate_legal_rules(rules)
+        self._validate_mainline_rules(rules)
+        self._validate_narrative_rules(rules)
         self._validate_random_events(rules)
         self._validate_inheritance(rules)
 
@@ -173,6 +177,42 @@ class RuleValidator:
 
         if int(legal["rehabilitation_gain_min"]) > int(legal["rehabilitation_gain_max"]):
             raise RuleValidationError("rehabilitation_gain_min cannot exceed rehabilitation_gain_max.")
+
+    def _validate_mainline_rules(self, rules: dict) -> None:
+        mainline = rules.get("mainline")
+        if not mainline:
+            raise RuleValidationError("Rule config must include mainline rules.")
+        if not mainline.get("use_mainline_v1", False):
+            return
+        if not str(mainline.get("mainline_version", "")).strip():
+            raise RuleValidationError("mainline_version cannot be empty when use_mainline_v1 is true.")
+        library = MainlineTaskLibraryLoader().load()
+        MainlineTaskValidator().validate_library(library)
+
+    def _validate_narrative_rules(self, rules: dict) -> None:
+        narrative = rules.get("narrative")
+        if not narrative:
+            raise RuleValidationError("Rule config must include narrative rules.")
+        if narrative.get("use_narrative_v1", False):
+            from app.rules.narrative_template_loader import NarrativeTemplateLoader
+
+            templates = NarrativeTemplateLoader().load()
+            required_groups = [
+                "life_stage_openings",
+                "normal_year_closings",
+                "death_templates",
+                "education_templates",
+                "career_templates",
+                "family_templates",
+                "health_templates",
+                "legal_templates",
+                "mainline_templates",
+                "inheritance_templates",
+                "random_event_templates",
+            ]
+            for group in required_groups:
+                if group not in templates:
+                    raise RuleValidationError(f"Narrative templates must include {group}.")
 
     def _validate_inheritance(self, rules: dict) -> None:
         inheritance = rules.get("inheritance")

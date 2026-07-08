@@ -3,6 +3,7 @@ import type {
   LegalChoiceResponse,
   LegalStateResponse,
   LifeStateResponse,
+  MainlineStateResponse,
   PendingRandomEventResponse,
   PlayableHeirsResponse,
   RandomEventChoiceResponse,
@@ -67,6 +68,10 @@ export const apiClient = {
       method: "POST",
       body: JSON.stringify({ choice_id: choiceId }),
     });
+  },
+
+  getMainlineState(lifeId: string): Promise<MainlineStateResponse> {
+    return request<MainlineStateResponse>(`/games/${lifeId}/mainline-state`);
   },
 
   getTimeline(lifeId: string): Promise<YearResult[]> {

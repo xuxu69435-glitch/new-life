@@ -1,0 +1,101 @@
+{
+  "version": "v1",
+  "source": "narrative_system_v1",
+  "life_stage_openings": {
+    "infant": "这一年，你还在依赖家人的照顾，生活的变化大多来自家庭和健康。",
+    "childhood": "这一年，学习和成长仍然是生活的中心。",
+    "teen": "这一年，学习和成长仍然是生活的中心。",
+    "college": "这一年，你在学习、社交和未来选择之间慢慢寻找方向。",
+    "adult": "这一年，工作、收入、关系和健康共同塑造着你的生活。",
+    "midlife": "这一年，责任和现实压力变得更明显。",
+    "elder": "这一年，你更关注健康、家庭和人生的延续。",
+    "prison": "这一年，你的人生被服刑状态改变，普通生活暂时停下。",
+    "fugitive": "这一年，你无法回到正常社会，只能在不稳定中维持生活。",
+    "default": "这一年，生活在平静与变化之间继续向前。"
+  },
+  "normal_year_closings": {
+    "default": "新的一年已经结束，你带着这一年的经历继续向前。",
+    "quiet": "这一年没有特别大的波澜，生活在平稳中继续。",
+    "death": "人生在这一年画上了句号，留下的故事等待被记住。",
+    "prison": "服刑生活仍在继续，你只能一步一步走完这段路。",
+    "fugitive": "潜逃的日子充满不确定，你不知道平静还能维持多久。"
+  },
+  "death_templates": {
+    "default": "你离开了这个世界。原因：{death_reason}。",
+    "natural_death": "岁月与健康最终走到了尽头，你安详地离开了人世。",
+    "direct_death": "突如其来的变故结束了你的生命，一切来得太过突然。"
+  },
+  "education_templates": {
+    "stage_change": "学业阶段从 {stage_before} 进入 {stage_after}。",
+    "graduation": "你完成了这一阶段的学业，正式毕业。",
+    "progress": "学习仍在继续，你在积累知识与能力。"
+  },
+  "career_templates": {
+    "employed": "你开始从事 {career_path} 相关工作，获得稳定职业收入。",
+    "income": "本年度职业收入 {income} 元，已计入你的资产。",
+    "retired": "你离开了工作岗位，进入退休生活。",
+    "status_change": "职业状态从 {status_before} 变为 {status_after}。"
+  },
+  "family_templates": {
+    "married": "你与伴侣步入婚姻，组建了新的家庭。",
+    "child_born": "家中迎来了新生命，你成为父母。",
+    "divorced": "婚姻关系发生变化，你经历了离婚。",
+    "relation_change": "家庭关系有所波动，需要更多耐心与沟通。"
+  },
+  "health_templates": {
+    "score_change": "健康评分从 {score_before} 变为 {score_after}（{delta}）。",
+    "warning": "健康警示：{warning}",
+    "stable": "身体状况总体稳定。"
+  },
+  "legal_templates": {
+    "E081": "法院作出判决，你将进入监狱服刑。",
+    "E082": "新的一年开始了，你需要决定自己在服刑期间的态度。",
+    "E083": "你努力参与劳动和学习，改造进度有所提升。",
+    "E084": "因积极改造，你获得了减刑机会。",
+    "E085": "由于连续多年积极改造且刑期较短，你获得了提前出狱的机会。",
+    "E086": "你决定冒险尝试逃离监狱。",
+    "E087": "越狱失败，你受到了更严厉的处罚。",
+    "E088": "你暂时逃离了监狱，但无法回到正常生活。",
+    "E089": "你无法使用正常身份找工作，只能靠零散工作维持生活。",
+    "E090": "潜逃生活没有持续太久，你最终再次被抓捕。",
+    "E091": "你结束服刑，重新回到社会，但犯罪记录仍将长期影响你。",
+    "E092": "你处于出狱监管期，许多正常职业暂时无法从事。",
+    "E093": "犯罪记录让你的就业选择受到限制。",
+    "in_prison": "你正在监狱中服刑，剩余刑期 {remaining} 年。",
+    "fugitive": "你处于潜逃状态，只能隐藏身份勉强维持生计。",
+    "released": "你正式出狱，开始尝试重新融入社会。"
+  },
+  "mainline_templates": {
+    "task_completed": "主线目标完成：{task_id}。{text}",
+    "guidance": "当前阶段指引：{text}"
+  },
+  "inheritance_templates": {
+    "settlement": "遗产结算完成：总资产 {gross} 元，税后净遗产 {net} 元，已分配给继承人。"
+  },
+  "random_event_templates": {
+    "triggered": "随机事件：{name}。{text}",
+    "choice_result": "你做出了选择：{choice_text}。{effects_text}"
+  },
+  "overview_templates": {
+    "default": "第 {age_after} 年的人生回顾。",
+    "death_centered": "第 {age_after} 年，你的人生走到了终点。",
+    "legal_centered": "第 {age_after} 年，法律与服刑状态主导了你的人生。",
+    "family_centered": "第 {age_after} 年，家庭关系成为生活的重心。"
+  },
+  "priority_ranks": {
+    "death": 1,
+    "inheritance": 2,
+    "legal": 3,
+    "family_marriage": 4,
+    "family_birth": 5,
+    "family_divorce": 6,
+    "education_graduation": 7,
+    "career_employed": 8,
+    "career_retired": 9,
+    "health_major": 10,
+    "random_event": 11,
+    "mainline_completed": 12,
+    "attribute_change": 13,
+    "asset_change": 14
+  }
+}

@@ -15,6 +15,7 @@ export type LifeState = {
   pending_random_event: Record<string, unknown> | null;
   legal?: Record<string, unknown>;
   pending_legal_event?: Record<string, unknown> | null;
+  mainline?: Record<string, unknown>;
   rule_version: string;
 };
 
@@ -71,6 +72,10 @@ export type YearResult = {
   career_income_change: number;
   occurred_events: SimulationEvent[];
   narrative_text: string;
+  narrative_result?: Record<string, unknown> | null;
+  annual_summary_text?: string;
+  major_event_texts?: string[];
+  display_sections?: Array<{ section_id: string; title: string; content: string }>;
   next_available_choices: AvailableChoice[];
   pending_random_event: Record<string, unknown> | null;
   unsupported_random_event_effects: Record<string, unknown>[];
@@ -85,6 +90,14 @@ export type YearResult = {
   children_count_delta: number;
   family_history_records: Record<string, unknown>[];
   family_changes: Record<string, unknown>;
+  mainline_changes: Record<string, unknown>;
+  active_mainline_tasks: MainlineTaskSummary[];
+  completed_mainline_tasks_this_year: string[];
+  failed_mainline_tasks_this_year: string[];
+  expired_mainline_tasks_this_year: string[];
+  mainline_rewards: Record<string, unknown>[];
+  mainline_narrative: string[];
+  current_guidance_text: string;
 };
 
 export type HeirShare = {
@@ -122,6 +135,22 @@ export type PlayableHeirsResponse = {
   source_life_id?: string;
   playable_heirs: PlayableHeir[];
   status: string;
+};
+
+export type MainlineTaskSummary = {
+  task_id: string;
+  title: string;
+  description: string;
+  chapter: string;
+  completion_summary: string;
+  progress: Record<string, unknown>;
+};
+
+export type MainlineStateResponse = {
+  life_id: string;
+  mainline: Record<string, unknown>;
+  active_tasks: MainlineTaskSummary[];
+  current_guidance_text: string;
 };
 
 export type LifeStateResponse = {

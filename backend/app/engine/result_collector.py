@@ -5,6 +5,7 @@ from app.modules.family.events import FamilyEventProcessor
 from app.modules.family.models import FamilyState
 from app.modules.health.sync import apply_post_health_changes
 from app.modules.legal.models import LegalState
+from app.modules.mainline.models import MainlineState
 
 
 class ResultCollector:
@@ -54,6 +55,15 @@ class ResultCollector:
         self._legal_working: LegalState | None = None
         self.pending_legal_event: dict[str, Any] | None = None
         self.legal_changes: dict[str, Any] = {}
+        self._mainline_working: MainlineState | None = None
+        self.mainline_changes: dict[str, Any] = {}
+        self.completed_mainline_tasks_this_year: list[str] = []
+        self.failed_mainline_tasks_this_year: list[str] = []
+        self.expired_mainline_tasks_this_year: list[str] = []
+        self.mainline_rewards: list[dict[str, Any]] = []
+        self.mainline_narrative: list[str] = []
+        self.current_guidance_text: str = ""
+        self.narrative_result: dict[str, Any] | None = None
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -80,6 +90,13 @@ class ResultCollector:
     def add_narrative(self, text: str) -> None:
         if text:
             self.narrative_lines.append(text)
+
+    def set_narrative_result(self, result: Any) -> None:
+        payload = result.to_dict() if hasattr(result, "to_dict") else dict(result)
+        self.narrative_result = payload
+        summary = str(payload.get("summary_text", ""))
+        if summary:
+            self.narrative_lines = [summary]
 
     def set_inheritance_result(self, result: dict[str, Any]) -> None:
         self.inheritance_result = result
@@ -109,6 +126,51 @@ class ResultCollector:
     def bind_legal_context(self, state: LifeState) -> None:
         if self._legal_working is None:
             self._legal_working = LegalState.from_life_state_dict(state.legal)
+
+    def bind_mainline_context(self, state: LifeState) -> None:
+        if self._mainline_working is None:
+            self._mainline_working = MainlineState.from_life_state_dict(state.mainline)
+
+    def snapshot_state(self, state: LifeState, rules: dict | None = None) -> LifeState:
+        snapshot = state.model_copy(deep=True)
+        snapshot.age += 1
+        if self.life_stage is not None:
+            snapshot.life_stage = self.life_stage
+
+        for key, delta in self.changed_attributes.items():
+            snapshot.attributes[key] = int(snapshot.attributes.get(key, 0)) + delta
+
+        if self.health_state_update is not None:
+            snapshot.health = dict(self.health_state_update)
+            if self.post_health_changes and rules is not None:
+                snapshot.health = apply_post_health_changes(
+                    snapshot.health,
+                    self.post_health_changes,
+                    rules,
+                )
+        else:
+            for key, delta in self.changed_health.items():
+                snapshot.health[key] = int(snapshot.health.get(key, 0)) + delta
+
+        for key, delta in self.changed_assets.items():
+            snapshot.assets[key] = float(snapshot.assets.get(key, 0.0)) + delta
+
+        from app.modules.assets.models import AssetState
+
+        snapshot.assets = AssetState.from_life_state_dict(snapshot.assets).to_life_state_dict()
+
+        for key, value in self.changed_flags.items():
+            snapshot.flags[key] = value
+
+        if self.education_state_update is not None:
+            snapshot.education = dict(self.education_state_update)
+        if self.career_state_update is not None:
+            snapshot.career = dict(self.career_state_update)
+        if self._family_working is not None:
+            snapshot.family = self._family_working.to_life_state_dict()
+        if self._legal_working is not None:
+            snapshot.legal = self._legal_working.to_life_state_dict()
+        return snapshot
 
     def collect_from_events(self, events: list[SimulationEvent]) -> None:
         for index, event in enumerate(events):
@@ -186,6 +248,29 @@ class ResultCollector:
                     self.legal_changes = merged
             elif event.event_type == SimulationEventType.LEGAL_CHOICE_APPLIED:
                 self.legal_changes = dict(payload)
+            elif event.event_type == SimulationEventType.MAINLINE_STATE_UPDATE_REQUESTED:
+                if self._mainline_working is not None:
+                    merged = self._mainline_working.to_life_state_dict()
+                    patch = dict(payload.get("mainline", {}))
+                    if patch:
+                        merged = {**merged, **patch}
+                    flags_patch = payload.get("mainline_flags_patch")
+                    if flags_patch:
+                        merged["mainline_flags"] = {
+                            **merged.get("mainline_flags", {}),
+                            **dict(flags_patch),
+                        }
+                    self._mainline_working = MainlineState.from_life_state_dict(merged)
+                    self.mainline_changes = merged
+                self.completed_mainline_tasks_this_year = list(
+                    payload.get("completed_this_year", [])
+                )
+                self.failed_mainline_tasks_this_year = list(payload.get("failed_this_year", []))
+                self.expired_mainline_tasks_this_year = list(payload.get("expired_this_year", []))
+                self.mainline_rewards = list(payload.get("rewards_this_year", []))
+                self.mainline_narrative = list(payload.get("mainline_narrative", []))
+                if self._mainline_working is not None:
+                    self.current_guidance_text = self._mainline_working.current_guidance_text
             elif event.event_type in {
                 SimulationEventType.FAMILY_RELATION_CHANGE_REQUESTED,
                 SimulationEventType.FAMILY_STATE_UPDATE_REQUESTED,
@@ -279,6 +364,9 @@ class ResultCollector:
         if self._legal_working is not None:
             next_state.legal = self._legal_working.to_life_state_dict()
 
+        if self._mainline_working is not None:
+            next_state.mainline = self._mainline_working.to_life_state_dict()
+
         if self.death_reason is not None:
             next_state.is_dead = True
             next_state.death_reason = self.death_reason
@@ -301,6 +389,13 @@ class ResultCollector:
         health_score_delta = 0
         if self.health_score_before is not None and self.health_score_after is not None:
             health_score_delta = self.health_score_after - self.health_score_before
+
+        from app.modules.mainline.service import MainlineService
+
+        active_mainline_tasks = MainlineService().get_active_task_summaries(
+            MainlineState.from_life_state_dict(after.mainline),
+            {},
+        )
 
         return YearResult(
             life_id=before.life_id,
@@ -357,4 +452,31 @@ class ResultCollector:
             family_changes=self.family_processor.summary(),
             pending_legal_event=self.pending_legal_event or after.pending_legal_event,
             legal_changes=dict(self.legal_changes),
+            active_mainline_tasks=active_mainline_tasks,
+            completed_mainline_tasks_this_year=list(self.completed_mainline_tasks_this_year),
+            failed_mainline_tasks_this_year=list(self.failed_mainline_tasks_this_year),
+            expired_mainline_tasks_this_year=list(self.expired_mainline_tasks_this_year),
+            mainline_rewards=list(self.mainline_rewards),
+            mainline_narrative=list(self.mainline_narrative),
+            current_guidance_text=self.current_guidance_text or after.mainline.get(
+                "current_guidance_text",
+                "",
+            ),
+            mainline_changes=dict(self.mainline_changes),
+            narrative_result=self.narrative_result,
+            annual_summary_text=(
+                self.narrative_result.get("summary_text", "")
+                if self.narrative_result
+                else "\n".join(self.narrative_lines)
+            ),
+            major_event_texts=(
+                list(self.narrative_result.get("major_event_texts", []))
+                if self.narrative_result
+                else []
+            ),
+            display_sections=(
+                list(self.narrative_result.get("display_sections", []))
+                if self.narrative_result
+                else []
+            ),
         )

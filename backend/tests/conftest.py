@@ -13,6 +13,7 @@ from app.modules.career.rules import build_default_career_state
 from app.modules.education.rules import build_default_education_state
 from app.modules.family.rules import build_default_family_state
 from app.modules.legal.rules import build_default_legal_state
+from app.modules.mainline.rules import build_default_mainline_state
 from app.rules.rule_loader import RuleLoader
 
 
@@ -34,6 +35,7 @@ def life_state(rules: dict) -> LifeState:
         education=build_default_education_state(rules).to_life_state_dict(),
         career=build_default_career_state(rules).to_life_state_dict(),
         legal=build_default_legal_state(rules).to_life_state_dict(),
+        mainline=build_default_mainline_state(rules).to_life_state_dict(),
         assets=dict(rules["default_assets"]),
         rule_version=rules["version"],
     )

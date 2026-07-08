@@ -4,10 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 
 import { apiClient } from "../api/client";
 import { useGameStore } from "../store/gameStore";
+import { AnnualNarrativeFromStore } from "./AnnualNarrativePanel";
 import { ChoicePanel } from "./ChoicePanel";
 import { FamilyPanel } from "./FamilyPanel";
 import { InheritancePanel } from "./InheritancePanel";
 import { LegalPanel } from "./LegalPanel";
+import { MainlinePanel } from "./MainlinePanel";
 import { RandomEventPanel } from "./RandomEventPanel";
 import { StatusPanel } from "./StatusPanel";
 import { TimelinePanel } from "./TimelinePanel";
@@ -66,6 +68,8 @@ export function LifeDashboard({ onExit }: LifeDashboardProps) {
             <ChoicePanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
             <RandomEventPanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
             <LegalPanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
+            <MainlinePanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
+            <AnnualNarrativeFromStore />
             <YearResultPanel />
             <TimelinePanel lifeId={lifeId} />
           </section>

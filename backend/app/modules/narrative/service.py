@@ -1,29 +1,28 @@
+from typing import Any
+
 from app.engine.simulation_context import SimulationContext
-from app.modules.narrative.templates import annual_summary
+from app.modules.narrative.composer import AnnualNarrativeComposer
+from app.modules.narrative.input_builder import build_annual_narrative_input
+from app.modules.narrative.models import AnnualNarrativeResult
 
 
 class NarrativeService:
     name = "narrative"
     can_confirm_death = False
 
-    def run(self, context: SimulationContext) -> None:
-        health_score_delta = 0
-        if (
-            context.result_collector.health_score_before is not None
-            and context.result_collector.health_score_after is not None
-        ):
-            health_score_delta = (
-                context.result_collector.health_score_after
-                - context.result_collector.health_score_before
-            )
+    def __init__(self, composer: AnnualNarrativeComposer | None = None) -> None:
+        self.composer = composer or AnnualNarrativeComposer()
 
-        context.result_collector.add_narrative(
-            annual_summary(
-                context.state.age + 1,
-                context.result_collector.death_confirmed,
-                context.result_collector.death_reason,
-                context.result_collector.death_type,
-                health_score_delta=health_score_delta,
-                health_warnings=context.result_collector.new_health_warnings,
-            )
-        )
+    def run(self, context: SimulationContext) -> None:
+        narrative_rules = context.rules.get("narrative", {})
+        if not narrative_rules.get("use_narrative_v1", True):
+            return
+
+        input_data = build_annual_narrative_input(context)
+        result = self.composer.compose(input_data)
+        context.result_collector.set_narrative_result(result)
+
+    def compose_from_payload(self, payload: dict[str, Any]) -> AnnualNarrativeResult:
+        from app.modules.narrative.models import AnnualNarrativeInput
+
+        return self.composer.compose(AnnualNarrativeInput.model_validate(payload))

@@ -4,6 +4,7 @@ from app.engine.simulation_context import LifeState, YearResult
 from app.modules.assets.models import AssetState
 from app.modules.family.rules import build_default_family_state
 from app.modules.legal.rules import build_default_legal_state
+from app.modules.mainline.rules import build_default_mainline_state
 from app.modules.education.rules import build_default_education_state
 from app.modules.career.rules import build_default_career_state
 from app.modules.health.rules import build_default_health_state
@@ -64,6 +65,7 @@ class SaveService:
             assets=default_assets,
             flags={},
             legal=build_default_legal_state(rules).to_life_state_dict(),
+            mainline=build_default_mainline_state(rules).to_life_state_dict(),
             rule_version=rule_version,
         )
         if source_life_id is not None:

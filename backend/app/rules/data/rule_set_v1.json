@@ -502,9 +502,19 @@
     "appeal_success_sentence_reduction_ratio": 0.1,
     "startup_cooperation_reject_probability_first_5_years": 0.15
   },
+  "mainline": {
+    "use_mainline_v1": true,
+    "mainline_version": "v1",
+    "library_file": "mainline_task_library_v1.json"
+  },
+  "narrative": {
+    "use_narrative_v1": true,
+    "narrative_version": "v1",
+    "templates_file": "narrative_templates_v1.json"
+  },
   "narrative_templates": {
-    "placeholder": true,
-    "templates": []
+    "placeholder": false,
+    "version": "v1"
   },
   "available_choices": {
     "default": [

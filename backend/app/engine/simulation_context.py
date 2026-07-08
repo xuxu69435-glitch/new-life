@@ -41,6 +41,7 @@ class SimulationEventType(str, Enum):
     LEGAL_STATE_UPDATE_REQUESTED = "LegalStateUpdateRequested"
     LEGAL_EVENT_TRIGGERED = "LegalEventTriggered"
     LEGAL_CHOICE_APPLIED = "LegalChoiceApplied"
+    MAINLINE_STATE_UPDATE_REQUESTED = "MainlineStateUpdateRequested"
 
 
 class LifeState(BaseModel):
@@ -60,6 +61,7 @@ class LifeState(BaseModel):
     pending_random_event: dict[str, Any] | None = None
     legal: dict[str, Any] = Field(default_factory=dict)
     pending_legal_event: dict[str, Any] | None = None
+    mainline: dict[str, Any] = Field(default_factory=dict)
     rule_version: str = "v1"
 
 
@@ -120,6 +122,18 @@ class YearResult(BaseModel):
     family_changes: dict[str, Any] = Field(default_factory=dict)
     pending_legal_event: dict[str, Any] | None = None
     legal_changes: dict[str, Any] = Field(default_factory=dict)
+    active_mainline_tasks: list[dict[str, Any]] = Field(default_factory=list)
+    completed_mainline_tasks_this_year: list[str] = Field(default_factory=list)
+    failed_mainline_tasks_this_year: list[str] = Field(default_factory=list)
+    expired_mainline_tasks_this_year: list[str] = Field(default_factory=list)
+    mainline_rewards: list[dict[str, Any]] = Field(default_factory=list)
+    mainline_narrative: list[str] = Field(default_factory=list)
+    current_guidance_text: str = ""
+    mainline_changes: dict[str, Any] = Field(default_factory=dict)
+    narrative_result: dict[str, Any] | None = None
+    annual_summary_text: str = ""
+    major_event_texts: list[str] = Field(default_factory=list)
+    display_sections: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class SimulationContext(BaseModel):

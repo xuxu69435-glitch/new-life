@@ -16,6 +16,7 @@ from app.modules.health.service import HealthService
 from app.modules.inheritance.service import InheritanceService
 from app.modules.legal.service import LegalService
 from app.modules.life_stage.service import LifeStageService
+from app.modules.mainline.service import MainlineService
 from app.modules.narrative.service import NarrativeService
 from app.modules.random_events.service import RandomEventsService
 
@@ -34,6 +35,7 @@ class SimulationEngine:
             RandomEventsService(),
             LegalService(),
             DeathService(),
+            MainlineService(),
         ]
         self.inheritance_module = InheritanceService()
         self.narrative_module = NarrativeService()
@@ -70,6 +72,7 @@ class SimulationEngine:
         )
         context.result_collector.bind_family_context(current_state, rules)
         context.result_collector.bind_legal_context(current_state)
+        context.result_collector.bind_mainline_context(current_state)
 
         for module in self.annual_modules:
             module.run(context)
@@ -114,6 +117,7 @@ class SimulationEngine:
 
         context.result_collector.bind_family_context(current_state, rules)
         context.result_collector.bind_legal_context(current_state)
+        context.result_collector.bind_mainline_context(current_state)
 
         random_events_module = RandomEventsService()
         choice_result = random_events_module.submit_choice(context, choice_id)
@@ -157,6 +161,7 @@ class SimulationEngine:
         )
         context.result_collector.bind_family_context(current_state, rules)
         context.result_collector.bind_legal_context(current_state)
+        context.result_collector.bind_mainline_context(current_state)
 
         legal_module = LegalService()
         choice_result = legal_module.submit_choice(context, choice_id)
