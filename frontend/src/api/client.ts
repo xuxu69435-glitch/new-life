@@ -1,5 +1,7 @@
 import type {
   InheritanceResult,
+  LegalChoiceResponse,
+  LegalStateResponse,
   LifeStateResponse,
   PendingRandomEventResponse,
   PlayableHeirsResponse,
@@ -51,6 +53,17 @@ export const apiClient = {
 
   submitRandomEventChoice(lifeId: string, choiceId: string): Promise<RandomEventChoiceResponse> {
     return request<RandomEventChoiceResponse>(`/games/${lifeId}/random-event-choice`, {
+      method: "POST",
+      body: JSON.stringify({ choice_id: choiceId }),
+    });
+  },
+
+  getLegalState(lifeId: string): Promise<LegalStateResponse> {
+    return request<LegalStateResponse>(`/games/${lifeId}/legal-state`);
+  },
+
+  submitLegalChoice(lifeId: string, choiceId: string): Promise<LegalChoiceResponse> {
+    return request<LegalChoiceResponse>(`/games/${lifeId}/legal-choice`, {
       method: "POST",
       body: JSON.stringify({ choice_id: choiceId }),
     });

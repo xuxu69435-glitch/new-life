@@ -28,6 +28,7 @@ class RuleValidator:
         self._validate_education_rules(rules)
         self._validate_career_rules(rules)
         self._validate_family_rules(rules)
+        self._validate_legal_rules(rules)
         self._validate_random_events(rules)
         self._validate_inheritance(rules)
 
@@ -150,6 +151,28 @@ class RuleValidator:
                 raise RuleValidationError(
                     f"Family {section} min_age cannot exceed max_age."
                 )
+
+    def _validate_legal_rules(self, rules: dict) -> None:
+        legal = rules.get("legal")
+        if not legal:
+            raise RuleValidationError("Rule config must include legal rules.")
+
+        required = [
+            "escape_success_probability",
+            "rehabilitation_gain_min",
+            "rehabilitation_gain_max",
+            "minimum_years_before_reduction",
+            "employment_penalty_by_year",
+        ]
+        for key in required:
+            if key not in legal:
+                raise RuleValidationError(f"Legal rules must include {key}.")
+
+        if not (0 < float(legal["escape_success_probability"]) <= 1):
+            raise RuleValidationError("escape_success_probability must be between 0 and 1.")
+
+        if int(legal["rehabilitation_gain_min"]) > int(legal["rehabilitation_gain_max"]):
+            raise RuleValidationError("rehabilitation_gain_min cannot exceed rehabilitation_gain_max.")
 
     def _validate_inheritance(self, rules: dict) -> None:
         inheritance = rules.get("inheritance")

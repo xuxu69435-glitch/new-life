@@ -13,6 +13,8 @@ export type LifeState = {
   assets: Record<string, number>;
   flags: Record<string, unknown>;
   pending_random_event: Record<string, unknown> | null;
+  legal?: Record<string, unknown>;
+  pending_legal_event?: Record<string, unknown> | null;
   rule_version: string;
 };
 
@@ -142,4 +144,35 @@ export type RandomEventChoiceResponse = {
 export type PendingRandomEventResponse = {
   life_id: string;
   pending_random_event: Record<string, unknown> | null;
+};
+
+export type LegalStatePayload = {
+  is_in_prison: boolean;
+  sentence_total_years: number;
+  sentence_remaining_years: number;
+  years_served: number;
+  rehabilitation_progress: number;
+  consecutive_rehabilitation_years: number;
+  is_fugitive: boolean;
+  has_criminal_record: boolean;
+  is_under_supervision: boolean;
+  supervision_remaining_years: number;
+  research_job_ban_remaining_years: number;
+  post_release_employment_penalty_year: number;
+  civil_service_banned: boolean;
+  [key: string]: unknown;
+};
+
+export type LegalStateResponse = {
+  life_id: string;
+  legal: LegalStatePayload;
+  pending_legal_event: Record<string, unknown> | null;
+  restrictions: Record<string, unknown>;
+};
+
+export type LegalChoiceResponse = {
+  life_id: string;
+  choice_result: Record<string, unknown>;
+  pending_legal_event: Record<string, unknown> | null;
+  state: LifeState;
 };

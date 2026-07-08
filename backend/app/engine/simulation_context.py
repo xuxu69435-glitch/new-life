@@ -38,6 +38,9 @@ class SimulationEventType(str, Enum):
     ASSET_CHANGE_REQUESTED = "AssetChangeRequested"
     UNSUPPORTED_EFFECT_RECORDED = "UnsupportedEffectRecorded"
     RANDOM_EVENT_CHOICE_APPLIED = "RandomEventChoiceApplied"
+    LEGAL_STATE_UPDATE_REQUESTED = "LegalStateUpdateRequested"
+    LEGAL_EVENT_TRIGGERED = "LegalEventTriggered"
+    LEGAL_CHOICE_APPLIED = "LegalChoiceApplied"
 
 
 class LifeState(BaseModel):
@@ -55,6 +58,8 @@ class LifeState(BaseModel):
     assets: dict[str, Any] = Field(default_factory=dict)
     flags: dict[str, Any] = Field(default_factory=dict)
     pending_random_event: dict[str, Any] | None = None
+    legal: dict[str, Any] = Field(default_factory=dict)
+    pending_legal_event: dict[str, Any] | None = None
     rule_version: str = "v1"
 
 
@@ -113,6 +118,8 @@ class YearResult(BaseModel):
     children_count_delta: int = 0
     family_history_records: list[dict[str, Any]] = Field(default_factory=list)
     family_changes: dict[str, Any] = Field(default_factory=dict)
+    pending_legal_event: dict[str, Any] | None = None
+    legal_changes: dict[str, Any] = Field(default_factory=dict)
 
 
 class SimulationContext(BaseModel):

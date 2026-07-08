@@ -4,6 +4,7 @@ from app.engine.simulation_context import LifeState, SimulationEvent, Simulation
 from app.modules.family.events import FamilyEventProcessor
 from app.modules.family.models import FamilyState
 from app.modules.health.sync import apply_post_health_changes
+from app.modules.legal.models import LegalState
 
 
 class ResultCollector:
@@ -50,6 +51,9 @@ class ResultCollector:
         self._family_working: FamilyState | None = None
         self._family_state_age: int = 0
         self._family_rules: dict[str, Any] | None = None
+        self._legal_working: LegalState | None = None
+        self.pending_legal_event: dict[str, Any] | None = None
+        self.legal_changes: dict[str, Any] = {}
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -101,6 +105,10 @@ class ResultCollector:
             self.random_event_asset_changes[key] = float(
                 self.random_event_asset_changes.get(key, 0.0)
             ) + float(delta)
+
+    def bind_legal_context(self, state: LifeState) -> None:
+        if self._legal_working is None:
+            self._legal_working = LegalState.from_life_state_dict(state.legal)
 
     def collect_from_events(self, events: list[SimulationEvent]) -> None:
         for index, event in enumerate(events):
@@ -170,6 +178,14 @@ class ResultCollector:
                 self.unsupported_random_event_effects.append(dict(payload))
             elif event.event_type == SimulationEventType.RANDOM_EVENT_CHOICE_APPLIED:
                 self.random_event_choice_result = dict(payload)
+            elif event.event_type == SimulationEventType.LEGAL_STATE_UPDATE_REQUESTED:
+                patch = dict(payload.get("legal", {}))
+                if self._legal_working is not None:
+                    merged = {**self._legal_working.to_life_state_dict(), **patch}
+                    self._legal_working = LegalState.from_life_state_dict(merged)
+                    self.legal_changes = merged
+            elif event.event_type == SimulationEventType.LEGAL_CHOICE_APPLIED:
+                self.legal_changes = dict(payload)
             elif event.event_type in {
                 SimulationEventType.FAMILY_RELATION_CHANGE_REQUESTED,
                 SimulationEventType.FAMILY_STATE_UPDATE_REQUESTED,
@@ -260,12 +276,17 @@ class ResultCollector:
         if self._family_working is not None:
             next_state.family = self._family_working.to_life_state_dict()
 
+        if self._legal_working is not None:
+            next_state.legal = self._legal_working.to_life_state_dict()
+
         if self.death_reason is not None:
             next_state.is_dead = True
             next_state.death_reason = self.death_reason
 
         if self.pending_random_event is not None:
             next_state.pending_random_event = dict(self.pending_random_event)
+        if self.pending_legal_event is not None:
+            next_state.pending_legal_event = dict(self.pending_legal_event)
         if self.random_event_choice_result is not None:
             next_state.pending_random_event = None
         return next_state
@@ -334,4 +355,6 @@ class ResultCollector:
             children_count_delta=self.family_processor.children_count_delta,
             family_history_records=list(self.family_processor.family_history_records),
             family_changes=self.family_processor.summary(),
+            pending_legal_event=self.pending_legal_event or after.pending_legal_event,
+            legal_changes=dict(self.legal_changes),
         )

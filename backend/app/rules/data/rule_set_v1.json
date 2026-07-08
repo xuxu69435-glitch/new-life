@@ -467,6 +467,41 @@
     },
     "annual_pressure_decay": 1
   },
+  "legal": {
+    "min_prison_age": 16,
+    "escape_success_probability": 0.05,
+    "escape_failure_sentence_increase_ratio": 0.2,
+    "recapture_sentence_increase_ratio": 0.3,
+    "rehabilitation_gain_min": 10,
+    "rehabilitation_gain_max": 50,
+    "minimum_years_before_reduction": 3,
+    "mandatory_reduction_after_consecutive_rehabilitation_years": 5,
+    "short_sentence_threshold_years": 5,
+    "short_sentence_release_after_consecutive_rehabilitation_years": 3,
+    "normal_reduction_ratio": 0.2,
+    "progress_bonus_threshold": 120,
+    "supervision_years_after_short_sentence_release": 1,
+    "research_job_ban_years_after_release": 10,
+    "employment_penalty_years_after_release": 5,
+    "employment_penalty_by_year": {
+      "1": 0.30,
+      "2": 0.24,
+      "3": 0.18,
+      "4": 0.12,
+      "5": 0.06,
+      "6": 0.0
+    },
+    "civil_service_banned_after_release": true,
+    "supervision_blocks_normal_work": true,
+    "fugitive_blocks_normal_work": true,
+    "prison_blocks_normal_life": true,
+    "fugitive_labor_income_low": 3000,
+    "fugitive_labor_income_medium": 6000,
+    "fugitive_labor_income_minimal": 1000,
+    "appeal_cost": 5000,
+    "appeal_success_sentence_reduction_ratio": 0.1,
+    "startup_cooperation_reject_probability_first_5_years": 0.15
+  },
   "narrative_templates": {
     "placeholder": true,
     "templates": []

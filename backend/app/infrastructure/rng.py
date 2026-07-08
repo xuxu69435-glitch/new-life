@@ -10,5 +10,8 @@ class ServerRandom:
     def random(self) -> float:
         return self._random.random()
 
+    def randint(self, a: int, b: int) -> int:
+        return self._random.randint(a, b)
+
     def choice(self, values: list[object]) -> object:
         return self._random.choice(values)

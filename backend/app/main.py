@@ -4,9 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.family_api import router as family_router
 from app.api.game_api import router as game_router
 from app.api.inheritance_api import router as inheritance_router
+from app.api.legal_api import dev_router as legal_dev_router
+from app.api.legal_api import router as legal_router
 from app.api.person_api import router as person_router
 from app.api.rules_api import include_dev_rules_router
 from app.api.timeline_api import router as timeline_router
+from app.infrastructure.config import settings
 from app.rules.rule_loader import RuleLoader
 
 app = FastAPI(title="Text Life Simulation API", version="0.1.0")
@@ -24,6 +27,9 @@ app.include_router(person_router)
 app.include_router(timeline_router)
 app.include_router(family_router)
 app.include_router(inheritance_router)
+app.include_router(legal_router)
+if settings.enable_dev_routes:
+    app.include_router(legal_dev_router)
 include_dev_rules_router(app)
 
 

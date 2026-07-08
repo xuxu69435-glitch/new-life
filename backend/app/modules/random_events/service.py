@@ -7,6 +7,8 @@ from app.modules.random_events.library_models import PendingRandomEvent, V1Event
 from app.modules.random_events.models import RandomEventDefinition
 from app.modules.random_events.rules import eligible_event_pool
 from app.modules.random_events.v1_draw import RandomEventV1DrawService
+from app.modules.legal.models import LegalState
+from app.modules.legal.rules import blocks_normal_random_events
 from app.rules.random_event_library_loader import RandomEventLibraryLoader
 
 
@@ -30,6 +32,10 @@ class RandomEventsService:
 
     def run(self, context: SimulationContext) -> None:
         if context.state.pending_random_event is not None:
+            return
+
+        legal = LegalState.from_life_state_dict(context.state.legal)
+        if blocks_normal_random_events(legal):
             return
 
         random_rules = context.rules.get("random_events", {})

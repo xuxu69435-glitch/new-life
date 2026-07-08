@@ -1,0 +1,160 @@
+"""Generate legal_event_library_v1.json for E081-E095."""
+import json
+from pathlib import Path
+
+OUTPUT = Path(__file__).resolve().parents[1] / "app" / "rules" / "data" / "legal_event_library_v1.json"
+
+EVENTS = [
+    {
+        "event_id": "E081",
+        "name": "入狱判决",
+        "pool_type": "system",
+        "trigger_conditions_text": "违法被抓后判定需要服刑",
+        "implementation_status": "active",
+        "event_text": "法院作出判决，你将进入监狱服刑。接下来几年，你的人生将受到犯罪记录和服刑状态的长期影响。",
+        "choices": [
+            {"choice_id": "E081_A", "label": "选项一", "choice_text": "接受判决", "effects_text": "进入入狱状态", "implementation_status": "active"},
+            {"choice_id": "E081_B", "label": "选项二", "choice_text": "上诉争取减轻", "effects_text": "上诉", "implementation_status": "planned"},
+            {"choice_id": "E081_C", "label": "选项三", "choice_text": "拒不配合", "effects_text": "拒不配合", "implementation_status": "planned"},
+        ],
+    },
+    {
+        "event_id": "E082",
+        "name": "年度服刑选择",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "is_in_prison且sentence_remaining_years>0",
+        "implementation_status": "active",
+        "event_text": "新的一年开始了，你需要决定自己在服刑期间的态度。",
+        "choices": [
+            {"choice_id": "E082_A", "label": "选项一", "choice_text": "积极改造", "effects_text": "改造进度增加", "implementation_status": "active"},
+            {"choice_id": "E082_B", "label": "选项二", "choice_text": "普通服刑", "effects_text": "普通服刑", "implementation_status": "active"},
+            {"choice_id": "E082_C", "label": "选项三", "choice_text": "尝试越狱", "effects_text": "越狱判定", "implementation_status": "active"},
+        ],
+    },
+    {
+        "event_id": "E083",
+        "name": "积极改造进度",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "选择积极改造",
+        "implementation_status": "active",
+        "event_text": "你努力参与劳动和学习，改造进度有所提升。",
+        "choices": [{"choice_id": "E083_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "进度增加", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E084",
+        "name": "减刑判定",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "满足减刑条件",
+        "implementation_status": "active",
+        "event_text": "你的改造表现获得认可，监狱考虑为你减刑。",
+        "choices": [{"choice_id": "E084_A", "label": "选项一", "choice_text": "系统判定", "effects_text": "减刑", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E085",
+        "name": "短刑期积极改造出狱",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "总刑期<5且连续3年积极改造",
+        "implementation_status": "active",
+        "event_text": "由于你连续多年积极改造，且原本刑期较短，你获得了提前出狱的机会。",
+        "choices": [{"choice_id": "E085_A", "label": "选项一", "choice_text": "系统释放", "effects_text": "提前出狱", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E086",
+        "name": "尝试越狱",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "选择尝试越狱",
+        "implementation_status": "active",
+        "event_text": "你决定冒险逃离监狱。这是极高风险行为，一旦失败或再次被抓，你的刑期会明显增加。",
+        "choices": [{"choice_id": "E086_A", "label": "选项一", "choice_text": "系统判定", "effects_text": "越狱判定", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E087",
+        "name": "越狱失败",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "越狱判定失败",
+        "implementation_status": "active",
+        "event_text": "越狱失败后，你受到了更严厉的处罚，原本的服刑安排也被打乱。",
+        "choices": [{"choice_id": "E087_A", "label": "选项一", "choice_text": "接受处罚", "effects_text": "刑期增加20%", "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E088",
+        "name": "越狱成功",
+        "pool_type": "prison_yearly",
+        "trigger_conditions_text": "越狱判定成功",
+        "implementation_status": "active",
+        "event_text": "你暂时逃离了监狱，但你无法回到正常生活，只能隐藏身份勉强维持生计。",
+        "choices": [{"choice_id": "E088_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "进入潜逃", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E089",
+        "name": "潜逃打零工",
+        "pool_type": "fugitive_yearly",
+        "trigger_conditions_text": "is_fugitive为true",
+        "implementation_status": "active",
+        "event_text": "你无法使用正常身份找工作，只能靠零散工作维持生活。",
+        "choices": [
+            {"choice_id": "E089_A", "label": "选项一", "choice_text": "低调打零工", "effects_text": "少量现金", "implementation_status": "active"},
+            {"choice_id": "E089_B", "label": "选项二", "choice_text": "冒险多赚钱", "effects_text": "中等现金", "implementation_status": "active"},
+            {"choice_id": "E089_C", "label": "选项三", "choice_text": "减少外出", "effects_text": "很少现金", "implementation_status": "active"},
+        ],
+    },
+    {
+        "event_id": "E090",
+        "name": "再次抓捕",
+        "pool_type": "fugitive_yearly",
+        "trigger_conditions_text": "潜逃结束后",
+        "implementation_status": "active",
+        "event_text": "潜逃生活没有持续太久，你最终再次被抓捕，刑期进一步增加。",
+        "choices": [{"choice_id": "E090_A", "label": "选项一", "choice_text": "接受后果", "effects_text": "重新入狱", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E091",
+        "name": "正式出狱",
+        "pool_type": "post_release_status",
+        "trigger_conditions_text": "sentence_remaining_years<=0",
+        "implementation_status": "active",
+        "event_text": "你结束服刑，重新回到社会。但犯罪记录仍然会影响你很长一段时间。",
+        "choices": [{"choice_id": "E091_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "正式出狱", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E092",
+        "name": "出狱监管期",
+        "pool_type": "post_release_status",
+        "trigger_conditions_text": "短刑期提前出狱或附带监管",
+        "implementation_status": "active",
+        "event_text": "你处于出狱监管期，暂时无法从事正常职业。",
+        "choices": [{"choice_id": "E092_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "监管期处理", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E093",
+        "name": "出狱后就业限制",
+        "pool_type": "long_term_status",
+        "trigger_conditions_text": "has_criminal_record且已出狱",
+        "implementation_status": "active",
+        "event_text": "犯罪记录仍在影响你的就业选择。",
+        "choices": [{"choice_id": "E093_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "就业限制", "is_system_choice": True, "implementation_status": "active"}],
+    },
+    {
+        "event_id": "E094",
+        "name": "出狱后创业限制",
+        "pool_type": "long_term_status",
+        "trigger_conditions_text": "有犯罪记录",
+        "implementation_status": "partial",
+        "event_text": "犯罪记录使你在创业融资和合作中面临额外障碍。",
+        "choices": [{"choice_id": "E094_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "创业限制占位", "is_system_choice": True, "implementation_status": "partial"}],
+    },
+    {
+        "event_id": "E095",
+        "name": "犯罪记录长期影响",
+        "pool_type": "long_term_status",
+        "trigger_conditions_text": "has_criminal_record",
+        "implementation_status": "partial",
+        "event_text": "犯罪记录持续影响你的社会评价和人生机会。",
+        "choices": [{"choice_id": "E095_A", "label": "选项一", "choice_text": "系统记录", "effects_text": "长期影响占位", "is_system_choice": True, "implementation_status": "partial"}],
+    },
+]
+
+if __name__ == "__main__":
+    payload = {"version": "v1", "source": "legal_system_v1", "event_count": len(EVENTS), "events": EVENTS}
+    OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print("Wrote", OUTPUT, "events:", len(EVENTS))

@@ -68,6 +68,57 @@ class GameCommandService:
             "state": next_state,
         }
 
+    def get_legal_state(self, life_id: str) -> dict[str, Any]:
+        state = self.save_service.get_life_state(life_id)
+        rules = self.rule_loader.load(state.rule_version)
+        from app.modules.legal.models import LegalState
+        from app.modules.legal.service import LegalService
+
+        legal = LegalState.from_life_state_dict(state.legal)
+        service = LegalService()
+        return {
+            "life_id": life_id,
+            "legal": legal.to_life_state_dict(),
+            "pending_legal_event": state.pending_legal_event,
+            "restrictions": service.get_restrictions_summary(legal, rules),
+        }
+
+    def submit_legal_choice(self, life_id: str, choice_id: str) -> dict[str, Any]:
+        state = self.save_service.get_life_state(life_id)
+        rules = self.rule_loader.load(state.rule_version)
+        next_state, choice_result = self.engine.submit_legal_choice(state, choice_id, rules)
+        self.save_service.save_life_state(next_state)
+        return {
+            "life_id": life_id,
+            "choice_result": choice_result,
+            "pending_legal_event": next_state.pending_legal_event,
+            "state": next_state,
+        }
+
+    def trigger_sentencing(self, life_id: str, sentence_years: int = 4) -> dict[str, Any]:
+        state = self.save_service.get_life_state(life_id)
+        rules = self.rule_loader.load(state.rule_version)
+        from app.engine.event_bus import EventBus
+        from app.engine.result_collector import ResultCollector
+        from app.engine.simulation_context import SimulationContext
+        from app.infrastructure.rng import ServerRandom
+        from app.modules.legal.service import LegalService
+
+        context = SimulationContext(
+            state=state,
+            player_choices={"annual_focus": "balanced_year"},
+            rule_version=state.rule_version,
+            rng=ServerRandom(1),
+            event_bus=EventBus(),
+            result_collector=ResultCollector(),
+            rules=rules,
+        )
+        context.result_collector.bind_legal_context(state)
+        pending = LegalService().begin_sentencing(context, sentence_years)
+        state.pending_legal_event = pending
+        self.save_service.save_life_state(state)
+        return {"life_id": life_id, "pending_legal_event": pending}
+
     def get_timeline(self, life_id: str) -> list[YearResult]:
         return self.save_service.get_timeline(life_id)
 

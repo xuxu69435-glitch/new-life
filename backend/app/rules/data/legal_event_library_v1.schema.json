@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LegalEventLibraryV1",
+  "type": "object",
+  "required": ["version", "events"],
+  "properties": {
+    "version": { "type": "string" },
+    "source": { "type": "string" },
+    "event_count": { "type": "integer" },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["event_id", "name", "pool_type", "implementation_status", "event_text"],
+        "properties": {
+          "event_id": { "type": "string", "pattern": "^E0(8[1-9]|9[0-5])$" },
+          "name": { "type": "string" },
+          "pool_type": {
+            "type": "string",
+            "enum": ["system", "prison_yearly", "fugitive_yearly", "post_release_status", "long_term_status"]
+          },
+          "trigger_conditions_text": { "type": "string" },
+          "implementation_status": {
+            "type": "string",
+            "enum": ["active", "partial", "planned"]
+          },
+          "event_text": { "type": "string" },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["choice_id", "label", "choice_text", "effects_text"],
+              "properties": {
+                "choice_id": { "type": "string" },
+                "label": { "type": "string" },
+                "choice_text": { "type": "string" },
+                "effects_text": { "type": "string" },
+                "implementation_status": {
+                  "type": "string",
+                  "enum": ["active", "partial", "planned"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

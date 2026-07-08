@@ -1,5 +1,7 @@
 from app.engine.simulation_context import SimulationContext, SimulationEventType
 from app.modules.education.models import EducationState
+from app.modules.legal.models import LegalState
+from app.modules.legal.rules import blocks_normal_education
 from app.modules.education.rules import resolve_stage_for_age
 
 
@@ -8,6 +10,10 @@ class EducationService:
     can_confirm_death = False
 
     def run(self, context: SimulationContext) -> None:
+        legal = LegalState.from_life_state_dict(context.state.legal)
+        if blocks_normal_education(legal, context.rules):
+            return
+
         rules = context.rules
         age = context.state.age
         next_age = age + 1

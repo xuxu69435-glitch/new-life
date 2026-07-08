@@ -4,7 +4,7 @@ from app.engine.event_bus import EventBus
 from app.engine.module_runner import SimulationModule
 from app.engine.result_collector import ResultCollector
 from app.engine.simulation_context import LifeState, SimulationContext, YearResult
-from app.infrastructure.errors import InvalidPlayerChoiceError, LifeAlreadyEndedError, PendingRandomEventError
+from app.infrastructure.errors import InvalidPlayerChoiceError, LifeAlreadyEndedError, PendingLegalEventError, PendingRandomEventError
 from app.infrastructure.rng import ServerRandom
 from app.modules.assets.service import AssetsService
 from app.modules.attributes.service import AttributesService
@@ -14,6 +14,7 @@ from app.modules.education.service import EducationService
 from app.modules.family.service import FamilyService
 from app.modules.health.service import HealthService
 from app.modules.inheritance.service import InheritanceService
+from app.modules.legal.service import LegalService
 from app.modules.life_stage.service import LifeStageService
 from app.modules.narrative.service import NarrativeService
 from app.modules.random_events.service import RandomEventsService
@@ -31,6 +32,7 @@ class SimulationEngine:
             AssetsService(),
             HealthService(),
             RandomEventsService(),
+            LegalService(),
             DeathService(),
         ]
         self.inheritance_module = InheritanceService()
@@ -44,6 +46,10 @@ class SimulationEngine:
     ) -> tuple[LifeState, YearResult, dict[str, Any] | None]:
         if current_state.is_dead:
             raise LifeAlreadyEndedError("Cannot advance a dead life.")
+        if current_state.pending_legal_event is not None:
+            raise PendingLegalEventError(
+                "Cannot advance year until the pending legal event choice is submitted."
+            )
         if current_state.pending_random_event is not None:
             raise PendingRandomEventError(
                 "Cannot advance year until the pending random event choice is submitted."
@@ -63,6 +69,7 @@ class SimulationEngine:
             rules=rules,
         )
         context.result_collector.bind_family_context(current_state, rules)
+        context.result_collector.bind_legal_context(current_state)
 
         for module in self.annual_modules:
             module.run(context)
@@ -106,6 +113,7 @@ class SimulationEngine:
         )
 
         context.result_collector.bind_family_context(current_state, rules)
+        context.result_collector.bind_legal_context(current_state)
 
         random_events_module = RandomEventsService()
         choice_result = random_events_module.submit_choice(context, choice_id)
@@ -125,6 +133,41 @@ class SimulationEngine:
             advance_age=False,
         )
         next_state.pending_random_event = None
+        return next_state, choice_result
+
+    def submit_legal_choice(
+        self,
+        current_state: LifeState,
+        choice_id: str,
+        rules: dict,
+    ) -> tuple[LifeState, dict[str, Any]]:
+        if current_state.is_dead:
+            raise LifeAlreadyEndedError("Cannot resolve choices for a dead life.")
+        if current_state.pending_legal_event is None:
+            raise InvalidPlayerChoiceError("No pending legal event is available.")
+
+        context = SimulationContext(
+            state=current_state,
+            player_choices={"annual_focus": "balanced_year"},
+            rule_version=current_state.rule_version,
+            rng=ServerRandom(self.rng_seed),
+            event_bus=EventBus(),
+            result_collector=ResultCollector(),
+            rules=rules,
+        )
+        context.result_collector.bind_family_context(current_state, rules)
+        context.result_collector.bind_legal_context(current_state)
+
+        legal_module = LegalService()
+        choice_result = legal_module.submit_choice(context, choice_id)
+        context.result_collector.collect_from_events(context.event_bus.all())
+
+        next_state = context.result_collector.apply_to_state(
+            current_state,
+            rules,
+            advance_age=False,
+        )
+        next_state.pending_legal_event = None
         return next_state, choice_result
 
     def get_available_choices(self, state: LifeState, rules: dict) -> list[dict[str, Any]]:

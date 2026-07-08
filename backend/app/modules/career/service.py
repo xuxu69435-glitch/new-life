@@ -9,6 +9,8 @@ from app.modules.career.rules import (
     select_career_path,
 )
 from app.modules.education.models import EducationState
+from app.modules.legal.models import LegalState
+from app.modules.legal.rules import blocks_normal_career
 
 
 class CareerService:
@@ -17,6 +19,10 @@ class CareerService:
 
     def run(self, context: SimulationContext) -> None:
         if context.state.is_dead:
+            return
+
+        legal = LegalState.from_life_state_dict(context.state.legal)
+        if blocks_normal_career(legal, context.rules):
             return
 
         rules = context.rules
