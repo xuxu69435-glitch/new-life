@@ -13,6 +13,7 @@ from app.api.rules_api import include_dev_rules_router
 from app.api.save_api import router as save_router
 from app.api.timeline_api import router as timeline_router
 from app.infrastructure.config import settings
+from app.infrastructure.save.db import init_database
 from app.rules.rule_loader import RuleLoader
 
 app = FastAPI(title="Text Life Simulation API", version="0.1.0")
@@ -44,6 +45,8 @@ def validate_default_rules_on_startup() -> None:
     loader = RuleLoader()
     loader.version_manager.ensure_default_available()
     loader.load_default()
+    if settings.save_repository_type == "postgres" and settings.auto_create_tables:
+        init_database(create_tables=True)
 
 
 @app.get("/health")

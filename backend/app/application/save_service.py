@@ -133,7 +133,6 @@ class SaveService:
         result: YearResult,
         inheritance_result: dict[str, Any] | None = None,
     ) -> LifeYearSnapshot:
-        self.append_timeline(result)
         snapshot = LifeYearSnapshot.from_year_advance(
             state_before,
             state_after,
@@ -141,11 +140,22 @@ class SaveService:
             inheritance_result=inheritance_result,
         )
         snapshot = self.migration.ensure_snapshot_shape(snapshot)
-        self.repository.append_snapshot(snapshot)
         event_logs = self._event_log_builder.build(result, snapshot.snapshot_id)
-        self.repository.append_event_logs(result.life_id, event_logs)
         timeline_entries = self._timeline_generator.generate(result, snapshot)
-        self.repository.append_timeline_entries(result.life_id, timeline_entries)
+
+        persist_bundle = getattr(self.repository, "persist_year_bundle", None)
+        if callable(persist_bundle):
+            persist_bundle(
+                snapshot=snapshot,
+                year_result=result,
+                event_logs=event_logs,
+                timeline_entries=timeline_entries,
+            )
+        else:
+            self.append_timeline(result)
+            self.repository.append_snapshot(snapshot)
+            self.repository.append_event_logs(result.life_id, event_logs)
+            self.repository.append_timeline_entries(result.life_id, timeline_entries)
         return snapshot
 
     def get_timeline(self, life_id: str) -> list[YearResult]:

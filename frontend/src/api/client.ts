@@ -8,6 +8,7 @@ import type {
   PendingRandomEventResponse,
   PlayableHeirsResponse,
   RandomEventChoiceResponse,
+  SavesListResponse,
   TimelineEntriesResponse,
   YearDetailResponse,
   YearResult,
@@ -79,6 +80,10 @@ export const apiClient = {
 
   getAchievementState(lifeId: string): Promise<AchievementStateResponse> {
     return request<AchievementStateResponse>(`/games/${lifeId}/achievement-state`);
+  },
+
+  listSaves(): Promise<SavesListResponse> {
+    return request<SavesListResponse>("/saves");
   },
 
   getTimeline(lifeId: string): Promise<YearResult[]> {

@@ -284,6 +284,18 @@ button {
   background: #f8f6f0;
 }
 
+.save-list-block {
+  margin-top: 24px;
+}
+
+.save-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: 8px;
+}
+
 .data-preview {
   overflow: auto;
   max-height: 240px;

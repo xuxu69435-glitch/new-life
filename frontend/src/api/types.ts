@@ -180,6 +180,25 @@ export type AchievementStateResponse = {
   unlocked_count: number;
 };
 
+export type SaveRecord = {
+  life_id: string;
+  user_id: string;
+  local_user_id: string;
+  rule_version: string;
+  created_at: string;
+  updated_at: string;
+  is_dead: boolean;
+  current_age: number;
+  current_generation: number;
+  save_version: string;
+  metadata: Record<string, unknown>;
+};
+
+export type SavesListResponse = {
+  saves: SaveRecord[];
+  count: number;
+};
+
 export type TimelineEntry = {
   entry_id: string;
   life_id: string;

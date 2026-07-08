@@ -1,12 +1,16 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+"""Legacy SQLAlchemy module kept for compatibility.
 
-from app.infrastructure.config import settings
+PostgreSQL persistence uses app.infrastructure.save.db instead.
+"""
+
+from app.infrastructure.save.db import get_engine, get_session_factory
+
+__all__ = ["get_engine", "get_session_factory", "engine", "SessionLocal"]
 
 
-class Base(DeclarativeBase):
-    pass
-
-
-engine = create_engine(settings.database_url, future=True)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+def __getattr__(name: str):
+    if name == "engine":
+        return get_engine()
+    if name == "SessionLocal":
+        return get_session_factory()
+    raise AttributeError(name)

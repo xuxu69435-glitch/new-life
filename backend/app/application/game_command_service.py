@@ -5,6 +5,7 @@ from app.application.save_service import SaveService
 from app.engine.simulation_context import LifeState, YearResult
 from app.engine.simulation_engine import SimulationEngine
 from app.infrastructure.errors import DomainError
+from app.infrastructure.save.factory import create_save_repository
 from app.modules.family.models import FamilyState
 from app.rules.rule_loader import RuleLoader
 
@@ -20,7 +21,7 @@ class GameCommandService:
         rule_loader: RuleLoader | None = None,
         engine: SimulationEngine | None = None,
     ) -> None:
-        self.save_service = save_service or SaveService()
+        self.save_service = save_service or SaveService(repository=create_save_repository())
         self.rule_loader = rule_loader or RuleLoader()
         self.engine = engine or SimulationEngine()
         self.life_progress = LifeProgressService(
