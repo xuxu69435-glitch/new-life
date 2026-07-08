@@ -62,6 +62,7 @@ class SimulationEngine:
             result_collector=ResultCollector(),
             rules=rules,
         )
+        context.result_collector.bind_family_context(current_state, rules)
 
         for module in self.annual_modules:
             module.run(context)
@@ -104,6 +105,8 @@ class SimulationEngine:
             rules=rules,
         )
 
+        context.result_collector.bind_family_context(current_state, rules)
+
         random_events_module = RandomEventsService()
         choice_result = random_events_module.submit_choice(context, choice_id)
         context.result_collector.collect_from_events(context.event_bus.all())
@@ -116,7 +119,11 @@ class SimulationEngine:
             self.inheritance_module.run(context)
             context.result_collector.collect_from_events(context.event_bus.all())
 
-        next_state = context.result_collector.apply_to_state(current_state, rules)
+        next_state = context.result_collector.apply_to_state(
+            current_state,
+            rules,
+            advance_age=False,
+        )
         next_state.pending_random_event = None
         return next_state, choice_result
 

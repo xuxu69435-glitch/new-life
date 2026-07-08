@@ -11,6 +11,7 @@ from app.engine.simulation_context import LifeState, SimulationContext
 from app.infrastructure.rng import ServerRandom
 from app.modules.career.rules import build_default_career_state
 from app.modules.education.rules import build_default_education_state
+from app.modules.family.rules import build_default_family_state
 from app.rules.rule_loader import RuleLoader
 
 
@@ -28,7 +29,7 @@ def life_state(rules: dict) -> LifeState:
         life_stage="infant",
         attributes=dict(rules["default_attributes"]),
         health=dict(rules["default_health"]),
-        family={"relations": []},
+        family=build_default_family_state(rules).to_life_state_dict(),
         education=build_default_education_state(rules).to_life_state_dict(),
         career=build_default_career_state(rules).to_life_state_dict(),
         assets=dict(rules["default_assets"]),

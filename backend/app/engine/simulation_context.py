@@ -20,6 +20,17 @@ class SimulationEventType(str, Enum):
     DIRECT_DEATH_CANDIDATE_CREATED = "DirectDeathCandidateCreated"
     INCOME_CHANGE_REQUESTED = "IncomeChangeRequested"
     FAMILY_RELATION_CHANGE_REQUESTED = "FamilyRelationChangeRequested"
+    FAMILY_STATE_UPDATE_REQUESTED = "FamilyStateUpdateRequested"
+    RELATIONSHIP_STATUS_CHANGE_REQUESTED = "RelationshipStatusChangeRequested"
+    PARTNER_CREATED = "PartnerCreated"
+    MARRIAGE_CREATED = "MarriageCreated"
+    CHILD_CREATED = "ChildCreated"
+    FAMILY_PRESSURE_CHANGE_REQUESTED = "FamilyPressureChangeRequested"
+    PARENT_RELATION_CHANGE_REQUESTED = "ParentRelationChangeRequested"
+    PARTNER_RELATION_CHANGE_REQUESTED = "PartnerRelationChangeRequested"
+    CHILD_RELATION_CHANGE_REQUESTED = "ChildRelationChangeRequested"
+    FAMILY_HISTORY_RECORDED = "FamilyHistoryRecorded"
+    DIVORCE_CREATED = "DivorceCreated"
     INHERITANCE_REQUESTED = "InheritanceRequested"
     NARRATIVE_REQUESTED = "NarrativeRequested"
     FLAG_SET_REQUESTED = "FlagSetRequested"
@@ -92,6 +103,16 @@ class YearResult(BaseModel):
     pending_random_event: dict[str, Any] | None = None
     unsupported_random_event_effects: list[dict[str, Any]] = Field(default_factory=list)
     random_event_choice_result: dict[str, Any] | None = None
+    relationship_status_before: str | None = None
+    relationship_status_after: str | None = None
+    partner_relation_delta: int = 0
+    parent_child_relation_delta: int = 0
+    family_pressure_delta: int = 0
+    married_this_year: bool = False
+    child_born_this_year: bool = False
+    children_count_delta: int = 0
+    family_history_records: list[dict[str, Any]] = Field(default_factory=list)
+    family_changes: dict[str, Any] = Field(default_factory=dict)
 
 
 class SimulationContext(BaseModel):

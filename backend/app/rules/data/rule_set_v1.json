@@ -420,8 +420,52 @@
     }
   },
   "family": {
-    "placeholder": true,
-    "relation_templates": []
+    "defaults": {
+      "parent_child_relation": 70,
+      "father_relation": 65,
+      "mother_relation": 65,
+      "partner_relation": 50,
+      "family_pressure": 30,
+      "relationship_status": "single"
+    },
+    "dating": {
+      "min_age": 18,
+      "max_age": 45,
+      "min_charm": 40
+    },
+    "marriage": {
+      "min_age": 22,
+      "max_age": 50,
+      "min_partner_relation": 70,
+      "default_cost": 20000,
+      "default_partner_relation_after_marriage": 75
+    },
+    "childbirth": {
+      "min_age": 24,
+      "max_age": 45,
+      "min_health": 40,
+      "initial_cost": 30000,
+      "default_child_name_prefix": "Child"
+    },
+    "child_education": {
+      "high_cost": 15000,
+      "normal_cost": 5000,
+      "low_cost": 0,
+      "high_ability_delta": 6,
+      "normal_ability_delta": 2,
+      "low_ability_delta": -2
+    },
+    "divorce": {
+      "min_partner_relation_to_crisis": 35,
+      "asset_split_placeholder": 5000
+    },
+    "parent_divorce_placeholder": {
+      "enabled": false
+    },
+    "event_cooldown_placeholder": {
+      "enabled": false
+    },
+    "annual_pressure_decay": 1
   },
   "narrative_templates": {
     "placeholder": true,

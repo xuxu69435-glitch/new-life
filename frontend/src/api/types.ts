@@ -73,6 +73,16 @@ export type YearResult = {
   pending_random_event: Record<string, unknown> | null;
   unsupported_random_event_effects: Record<string, unknown>[];
   random_event_choice_result: Record<string, unknown> | null;
+  relationship_status_before: string | null;
+  relationship_status_after: string | null;
+  partner_relation_delta: number;
+  parent_child_relation_delta: number;
+  family_pressure_delta: number;
+  married_this_year: boolean;
+  child_born_this_year: boolean;
+  children_count_delta: number;
+  family_history_records: Record<string, unknown>[];
+  family_changes: Record<string, unknown>;
 };
 
 export type HeirShare = {

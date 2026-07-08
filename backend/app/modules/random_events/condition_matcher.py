@@ -1,6 +1,7 @@
 from typing import Any
 
 from app.engine.simulation_context import LifeState
+from app.modules.family.models import FamilyState
 from app.modules.random_events.library_models import V1EventDefinition
 
 
@@ -13,18 +14,22 @@ class RandomEventConditionMatcher:
         if not self._matches_age(event, state):
             return False
 
+        family = FamilyState.from_life_state_dict(state.family)
+
         for key, expected in conditions.items():
             if key in {
                 "min_age",
                 "max_age",
                 "age_equals",
+                "age_min",
+                "age_max",
                 "life_stages",
                 "system_only",
                 "unsupported_condition",
                 "pool",
             }:
                 continue
-            if not self._evaluate_condition(key, expected, state):
+            if not self._evaluate_condition(key, expected, state, family):
                 return False
         return True
 
@@ -34,9 +39,11 @@ class RandomEventConditionMatcher:
             return False
 
         conditions = event.conditions or {}
-        if "min_age" in conditions and age < int(conditions["min_age"]):
+        min_age = conditions.get("min_age", conditions.get("age_min"))
+        max_age = conditions.get("max_age", conditions.get("age_max"))
+        if min_age is not None and age < int(min_age):
             return False
-        if "max_age" in conditions and age > int(conditions["max_age"]):
+        if max_age is not None and age > int(max_age):
             return False
         if "age_equals" in conditions and age != int(conditions["age_equals"]):
             return False
@@ -51,7 +58,13 @@ class RandomEventConditionMatcher:
                 return False
         return True
 
-    def _evaluate_condition(self, key: str, expected: Any, state: LifeState) -> bool:
+    def _evaluate_condition(
+        self,
+        key: str,
+        expected: Any,
+        state: LifeState,
+        family: FamilyState,
+    ) -> bool:
         if key == "health_below":
             return self._health_score(state) < int(expected)
         if key == "health_above":
@@ -86,6 +99,35 @@ class RandomEventConditionMatcher:
         if key == "attribute_above":
             attr_key, threshold = self._pair(expected)
             return int(state.attributes.get(attr_key, 0)) > int(threshold)
+        if key == "relationship_status_in":
+            values = expected if isinstance(expected, list) else [expected]
+            return family.relationship_status in values
+        if key == "relationship_status":
+            return family.relationship_status == str(expected)
+        if key == "partner_relation_min":
+            return family.partner_relation >= int(expected)
+        if key == "partner_relation_max":
+            return family.partner_relation <= int(expected)
+        if key == "has_spouse":
+            return family.has_spouse() is bool(expected)
+        if key == "has_children":
+            return family.has_children() is bool(expected)
+        if key == "children_count_min":
+            return family.children_count >= int(expected)
+        if key == "children_count_max":
+            return family.children_count <= int(expected)
+        if key == "family_pressure_min":
+            return family.family_pressure >= int(expected)
+        if key == "family_pressure_max":
+            return family.family_pressure <= int(expected)
+        if key == "parent_child_relation_min":
+            return family.parent_child_relation >= int(expected)
+        if key == "parent_child_relation_max":
+            return family.parent_child_relation <= int(expected)
+        if key == "father_relation_min":
+            return family.father_relation >= int(expected)
+        if key == "mother_relation_min":
+            return family.mother_relation >= int(expected)
         if key in {"family_state", "relationship_state", "unsupported_condition"}:
             return True
         return True

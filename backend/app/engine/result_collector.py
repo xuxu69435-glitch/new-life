@@ -1,6 +1,8 @@
 from typing import Any
 
 from app.engine.simulation_context import LifeState, SimulationEvent, SimulationEventType, YearResult
+from app.modules.family.events import FamilyEventProcessor
+from app.modules.family.models import FamilyState
 from app.modules.health.sync import apply_post_health_changes
 
 
@@ -44,6 +46,10 @@ class ResultCollector:
         self.pending_random_event: dict[str, Any] | None = None
         self.unsupported_random_event_effects: list[dict[str, Any]] = []
         self.random_event_choice_result: dict[str, Any] | None = None
+        self.family_processor = FamilyEventProcessor()
+        self._family_working: FamilyState | None = None
+        self._family_state_age: int = 0
+        self._family_rules: dict[str, Any] | None = None
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -164,10 +170,54 @@ class ResultCollector:
                 self.unsupported_random_event_effects.append(dict(payload))
             elif event.event_type == SimulationEventType.RANDOM_EVENT_CHOICE_APPLIED:
                 self.random_event_choice_result = dict(payload)
+            elif event.event_type in {
+                SimulationEventType.FAMILY_RELATION_CHANGE_REQUESTED,
+                SimulationEventType.FAMILY_STATE_UPDATE_REQUESTED,
+                SimulationEventType.RELATIONSHIP_STATUS_CHANGE_REQUESTED,
+                SimulationEventType.PARTNER_CREATED,
+                SimulationEventType.MARRIAGE_CREATED,
+                SimulationEventType.CHILD_CREATED,
+                SimulationEventType.FAMILY_PRESSURE_CHANGE_REQUESTED,
+                SimulationEventType.PARENT_RELATION_CHANGE_REQUESTED,
+                SimulationEventType.PARTNER_RELATION_CHANGE_REQUESTED,
+                SimulationEventType.CHILD_RELATION_CHANGE_REQUESTED,
+                SimulationEventType.FAMILY_HISTORY_RECORDED,
+                SimulationEventType.DIVORCE_CREATED,
+            }:
+                self._apply_family_event(event.event_type, payload)
 
-    def apply_to_state(self, state: LifeState, rules: dict | None = None) -> LifeState:
+    def bind_family_context(self, state: LifeState, rules: dict[str, Any]) -> None:
+        self._family_state_age = state.age
+        self._family_rules = rules
+        if self._family_working is None:
+            base = FamilyState.from_life_state_dict(state.family)
+            self._family_working = self.family_processor.initialize(base)
+
+    def _apply_family_event(
+        self,
+        event_type: SimulationEventType,
+        payload: dict[str, Any],
+    ) -> None:
+        if self._family_working is None or self._family_rules is None:
+            return
+        self._family_working = self.family_processor.process(
+            event_type,
+            payload,
+            self._family_working,
+            self._family_state_age,
+            self._family_rules,
+        )
+
+    def apply_to_state(
+        self,
+        state: LifeState,
+        rules: dict | None = None,
+        *,
+        advance_age: bool = True,
+    ) -> LifeState:
         next_state = state.model_copy(deep=True)
-        next_state.age += 1
+        if advance_age:
+            next_state.age += 1
         if self.life_stage is not None:
             next_state.life_stage = self.life_stage
 
@@ -206,6 +256,9 @@ class ResultCollector:
             next_state.education = dict(self.education_state_update)
         if self.career_state_update is not None:
             next_state.career = dict(self.career_state_update)
+
+        if self._family_working is not None:
+            next_state.family = self._family_working.to_life_state_dict()
 
         if self.death_reason is not None:
             next_state.is_dead = True
@@ -271,4 +324,14 @@ class ResultCollector:
             pending_random_event=self.pending_random_event or after.pending_random_event,
             unsupported_random_event_effects=list(self.unsupported_random_event_effects),
             random_event_choice_result=self.random_event_choice_result,
+            relationship_status_before=self.family_processor.relationship_status_before,
+            relationship_status_after=self.family_processor.relationship_status_after,
+            partner_relation_delta=self.family_processor.partner_relation_delta,
+            parent_child_relation_delta=self.family_processor.parent_child_relation_delta,
+            family_pressure_delta=self.family_processor.family_pressure_delta,
+            married_this_year=self.family_processor.married_this_year,
+            child_born_this_year=self.family_processor.child_born_this_year,
+            children_count_delta=self.family_processor.children_count_delta,
+            family_history_records=list(self.family_processor.family_history_records),
+            family_changes=self.family_processor.summary(),
         )

@@ -313,9 +313,7 @@
       "conditions": {
         "min_age": 0,
         "max_age": 18,
-        "unsupported_condition": {
-          "text": "家庭压力高于60"
-        }
+        "family_pressure_min": 60
       },
       "weight_tier": "中概率",
       "weight": 5,
@@ -334,6 +332,12 @@
               "target": "charm",
               "value": -5,
               "reason": "幸福感减5"
+            },
+            {
+              "type": "family_pressure_change",
+              "target": "family_pressure",
+              "value": 3,
+              "reason": "家庭压力上升"
             }
           ],
           "requires_confirmation": false,
@@ -346,10 +350,10 @@
           "effects_text": "亲子关系加3，幸福感减2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "亲子关系加3",
-              "value": 0,
-              "reason": "not implemented: 亲子关系加3"
+              "type": "parent_relation_change",
+              "target": "parent_child_relation",
+              "value": 3,
+              "reason": "亲子关系加3"
             },
             {
               "type": "attribute_change",
@@ -368,16 +372,16 @@
           "effects_text": "亲子关系减5，独立性加3",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "亲子关系减5",
-              "value": 0,
-              "reason": "not implemented: 亲子关系减5"
+              "type": "parent_relation_change",
+              "target": "parent_child_relation",
+              "value": -5,
+              "reason": "亲子关系减5"
             },
             {
-              "type": "unsupported_effect",
-              "target": "独立性加3",
-              "value": 0,
-              "reason": "not implemented: 独立性加3"
+              "type": "flag_set",
+              "target": "independence",
+              "value": 3,
+              "reason": "独立性加3"
             }
           ],
           "requires_confirmation": false,
@@ -386,10 +390,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "parents/family system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E004父母关系紧张\n\n年龄段：0到18岁\n触发条件：家庭压力高于60\n出现权重：中概率\n是否可重复：可重复，冷却4年\n事件文本：你能感觉到父母最近经常争吵，家里的气氛变得压抑。\n选项一：保持沉默\n效果：幸福感减5\n选项二：主动安慰父母\n效果：亲子关系加3，幸福感减2\n选项三：逃避家庭氛围\n效果：亲子关系减5，独立性加3",
       "pool_type": "normal"
     },
@@ -501,9 +503,9 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
+      "implementation_status": "partial",
       "unsupported_reasons": [
-        "parents/family system not implemented"
+        "advanced family/legal system placeholder"
       ],
       "source_text": "E005父母离异\n\n年龄段：3到18岁\n触发条件：父母关系低于30，家庭压力高于70\n出现权重：低概率\n是否可重复：不可重复\n事件文本：父母最终决定分开生活，你的人生环境发生了明显变化。\n选项一：跟随父亲生活\n效果：父亲关系加5，母亲关系减5，幸福感减8\n选项二：跟随母亲生活\n效果：母亲关系加5，父亲关系减5，幸福感减8\n选项三：由系统根据经济条件决定\n效果：家庭资产变化根据监护人收入计算，幸福感减6",
       "pool_type": "normal"
@@ -598,9 +600,9 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
+      "implementation_status": "partial",
       "unsupported_reasons": [
-        "parents/family system not implemented"
+        "advanced family/legal system placeholder"
       ],
       "source_text": "E006父母再婚\n\n年龄段：6到22岁\n触发条件：父母离异后至少2年\n出现权重：中低概率\n是否可重复：最多触发一次\n事件文本：照顾你的监护人开始新的感情生活，家里出现了新的家庭成员。\n选项一：尝试接受\n效果：幸福感加2，家庭压力减3\n选项二：保持距离\n效果：幸福感不变，亲子关系减2\n选项三：强烈排斥\n效果：幸福感减5，家庭压力加6",
       "pool_type": "normal"
@@ -621,10 +623,7 @@
       "trigger_conditions_text": "家庭资产变化较大，或父母职业变动",
       "conditions": {
         "min_age": 3,
-        "max_age": 18,
-        "unsupported_condition": {
-          "text": "家庭资产变化较大，或父母职业变动"
-        }
+        "max_age": 18
       },
       "weight_tier": "中概率",
       "weight": 5,
@@ -639,10 +638,10 @@
           "effects_text": "适应力加4，幸福感减2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "适应力加4",
-              "value": 0,
-              "reason": "not implemented: 适应力加4"
+              "type": "flag_set",
+              "target": "adaptability",
+              "value": 4,
+              "reason": "适应力加4"
             },
             {
               "type": "attribute_change",
@@ -701,10 +700,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "parents/family system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E007家庭搬家\n\n年龄段：3到18岁\n触发条件：家庭资产变化较大，或父母职业变动\n出现权重：中概率\n是否可重复：可重复，冷却5年\n事件文本：因为生活或工作的原因，家里决定搬到新的地方。\n选项一：接受新环境\n效果：适应力加4，幸福感减2\n选项二：怀念旧环境\n效果：幸福感减5，社交能力减2\n选项三：主动结交新朋友\n效果：社交能力加5，幸福感加1\n\n五、婴幼儿事件",
       "pool_type": "normal"
     },
@@ -5289,8 +5286,12 @@
       "conditions": {
         "min_age": 18,
         "max_age": 45,
-        "unsupported_condition": {
-          "text": "未婚，社交能力高于40"
+        "relationship_status_in": [
+          "single"
+        ],
+        "attribute_above": {
+          "key": "charm",
+          "value": 40
         }
       },
       "weight_tier": "中概率",
@@ -5306,10 +5307,16 @@
           "effects_text": "恋爱概率提高，幸福感加4，压力加2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "恋爱概率提高",
-              "value": 0,
-              "reason": "not implemented: 恋爱概率提高"
+              "type": "partner_created",
+              "target": "dating_partner",
+              "value": 1,
+              "name": "Partner",
+              "relation_score": 60
+            },
+            {
+              "type": "relationship_status_change",
+              "target": "relationship_status",
+              "value": "dating"
             },
             {
               "type": "attribute_change",
@@ -5334,10 +5341,16 @@
           "effects_text": "恋爱概率中等，社交能力加2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "恋爱概率中等",
-              "value": 0,
-              "reason": "not implemented: 恋爱概率中等"
+              "type": "partner_created",
+              "target": "dating_partner",
+              "value": 1,
+              "name": "Partner",
+              "relation_score": 55
+            },
+            {
+              "type": "relationship_status_change",
+              "target": "relationship_status",
+              "value": "dating"
             },
             {
               "type": "attribute_change",
@@ -5362,10 +5375,10 @@
               "reason": "幸福感减2"
             },
             {
-              "type": "unsupported_effect",
-              "target": "恋爱概率归零",
+              "type": "flag_set",
+              "target": "dating_chance",
               "value": 0,
-              "reason": "not implemented: 恋爱概率归零"
+              "reason": "恋爱概率归零"
             }
           ],
           "requires_confirmation": false,
@@ -5374,10 +5387,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E051遇到心动的人\n\n年龄段：18到45岁\n触发条件：未婚，社交能力高于40\n出现权重：中概率\n是否可重复：可重复，冷却3年\n事件文本：你在生活中遇到一个让你心动的人，对方也愿意继续接触。\n选项一：主动追求\n效果：恋爱概率提高，幸福感加4，压力加2\n选项二：慢慢了解\n效果：恋爱概率中等，社交能力加2\n选项三：错过机会\n效果：幸福感减2，恋爱概率归零",
       "pool_type": "normal"
     },
@@ -5396,9 +5407,10 @@
       "conditions": {
         "min_age": 18,
         "max_age": 50,
-        "unsupported_condition": {
-          "text": "恋爱中，关系值高于60"
-        }
+        "relationship_status_in": [
+          "dating"
+        ],
+        "partner_relation_min": 60
       },
       "weight_tier": "中概率",
       "weight": 5,
@@ -5413,10 +5425,9 @@
           "effects_text": "伴侣关系加5，幸福感加4",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系加5",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系加5"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": 5
             },
             {
               "type": "attribute_change",
@@ -5435,10 +5446,10 @@
           "effects_text": "结婚概率提高，压力加3",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "结婚概率提高",
-              "value": 0,
-              "reason": "not implemented: 结婚概率提高"
+              "type": "flag_set",
+              "target": "marriage_chance",
+              "value": 1,
+              "reason": "结婚概率提高"
             },
             {
               "type": "attribute_change",
@@ -5457,16 +5468,9 @@
           "effects_text": "关系小幅提升，变化较小",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "关系小幅提升",
-              "value": 0,
-              "reason": "not implemented: 关系小幅提升"
-            },
-            {
-              "type": "unsupported_effect",
-              "target": "变化较小",
-              "value": 0,
-              "reason": "not implemented: 变化较小"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": 2
             }
           ],
           "requires_confirmation": false,
@@ -5475,10 +5479,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E052恋爱稳定\n\n年龄段：18到50岁\n触发条件：恋爱中，关系值高于60\n出现权重：中概率\n是否可重复：可重复，冷却3年\n事件文本：你们的关系越来越稳定，开始认真考虑未来。\n选项一：继续经营关系\n效果：伴侣关系加5，幸福感加4\n选项二：谈论结婚\n效果：结婚概率提高，压力加3\n选项三：保持现状\n效果：关系小幅提升，变化较小",
       "pool_type": "normal"
     },
@@ -5497,8 +5499,13 @@
       "conditions": {
         "min_age": 18,
         "max_age": 60,
-        "unsupported_condition": {
-          "text": "恋爱或已婚，压力高于60"
+        "relationship_status_in": [
+          "dating",
+          "married"
+        ],
+        "attribute_below": {
+          "key": "stress_resistance",
+          "value": 40
         }
       },
       "weight_tier": "中概率",
@@ -5514,10 +5521,9 @@
           "effects_text": "伴侣关系加4，压力减2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系加4",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系加4"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": 4
             },
             {
               "type": "attribute_change",
@@ -5536,16 +5542,9 @@
           "effects_text": "伴侣关系减5，压力不变",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减5",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减5"
-            },
-            {
-              "type": "unsupported_effect",
-              "target": "压力不变",
-              "value": 0,
-              "reason": "not implemented: 压力不变"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -5
             }
           ],
           "requires_confirmation": false,
@@ -5558,16 +5557,15 @@
           "effects_text": "伴侣关系减10，分手或离婚风险提高",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减10",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减10"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -10
             },
             {
-              "type": "unsupported_effect",
-              "target": "分手或离婚风险提高",
-              "value": 0,
-              "reason": "not implemented: 分手或离婚风险提高"
+              "type": "flag_set",
+              "target": "breakup_risk",
+              "value": 1,
+              "reason": "分手或离婚风险提高"
             }
           ],
           "requires_confirmation": false,
@@ -5576,10 +5574,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E053感情争吵\n\n年龄段：18到60岁\n触发条件：恋爱或已婚，压力高于60\n出现权重：中概率\n是否可重复：可重复，冷却2年\n事件文本：你和伴侣因为生活安排发生争吵，关系出现裂痕。\n选项一：认真沟通\n效果：伴侣关系加4，压力减2\n选项二：冷处理\n效果：伴侣关系减5，压力不变\n选项三：激烈争吵\n效果：伴侣关系减10，分手或离婚风险提高",
       "pool_type": "normal"
     },
@@ -5598,9 +5594,10 @@
       "conditions": {
         "min_age": 22,
         "max_age": 50,
-        "unsupported_condition": {
-          "text": "恋爱中，关系值高于70"
-        }
+        "relationship_status_in": [
+          "dating"
+        ],
+        "partner_relation_min": 70
       },
       "weight_tier": "中概率",
       "weight": 5,
@@ -5615,10 +5612,9 @@
           "effects_text": "进入婚姻状态，个人资产减20000，幸福感加8",
           "effects": [
             {
-              "type": "flag_set",
-              "target": "married",
-              "value": true,
-              "reason": "进入婚姻状态"
+              "type": "marriage_created",
+              "target": "spouse",
+              "value": 1
             },
             {
               "type": "asset_change",
@@ -5643,10 +5639,9 @@
           "effects_text": "伴侣关系减2，压力减2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减2",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减2"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -2
             },
             {
               "type": "attribute_change",
@@ -5665,16 +5660,15 @@
           "effects_text": "伴侣关系减8，可能分手",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减8",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减8"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -8
             },
             {
-              "type": "unsupported_effect",
-              "target": "可能分手",
-              "value": 0,
-              "reason": "not implemented: 可能分手"
+              "type": "flag_set",
+              "target": "breakup_risk",
+              "value": 1,
+              "reason": "可能分手"
             }
           ],
           "requires_confirmation": false,
@@ -5683,10 +5677,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E054结婚选择\n\n年龄段：22到50岁\n触发条件：恋爱中，关系值高于70\n出现权重：中概率\n是否可重复：最多一次成功\n事件文本：你们开始讨论是否结婚，这会改变你的家庭结构和财务安排。\n选项一：结婚\n效果：进入婚姻状态，个人资产减20000，幸福感加8\n选项二：暂缓\n效果：伴侣关系减2，压力减2\n选项三：拒绝婚姻\n效果：伴侣关系减8，可能分手",
       "pool_type": "normal"
     },
@@ -5705,6 +5697,9 @@
       "conditions": {
         "min_age": 24,
         "max_age": 45,
+        "relationship_status_in": [
+          "married"
+        ],
         "health_above": 40
       },
       "weight_tier": "中概率",
@@ -5720,16 +5715,15 @@
           "effects_text": "子女数量加1，家庭资产减30000，幸福感加8，压力加10",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "子女数量加1",
-              "value": 0,
-              "reason": "not implemented: 子女数量加1"
+              "type": "child_created",
+              "target": "children",
+              "value": 1
             },
             {
-              "type": "unsupported_effect",
-              "target": "家庭资产减30000",
-              "value": 0,
-              "reason": "family cash not implemented"
+              "type": "asset_change",
+              "target": "cash",
+              "value": -30000,
+              "reason": "养育初始成本"
             },
             {
               "type": "attribute_change",
@@ -5760,10 +5754,9 @@
               "reason": "压力减2"
             },
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系可能小幅变化",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系可能小幅变化"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": 1
             }
           ],
           "requires_confirmation": false,
@@ -5776,10 +5769,9 @@
           "effects_text": "伴侣关系根据伴侣观念变化，资产不变",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系根据伴侣观念变化",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系根据伴侣观念变化"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -2
             }
           ],
           "requires_confirmation": false,
@@ -5788,11 +5780,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented",
-        "children system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E055生育选择\n\n年龄段：24到45岁\n触发条件：已婚或稳定伴侣，健康高于40\n出现权重：中概率\n是否可重复：可重复，按子女数量降低权重\n事件文本：你和伴侣开始考虑是否要孩子。\n选项一：要孩子\n效果：子女数量加1，家庭资产减30000，幸福感加8，压力加10\n选项二：暂时不要\n效果：压力减2，伴侣关系可能小幅变化\n选项三：明确不要\n效果：伴侣关系根据伴侣观念变化，资产不变",
       "pool_type": "normal"
     },
@@ -5811,9 +5800,8 @@
       "conditions": {
         "min_age": 30,
         "max_age": 60,
-        "unsupported_condition": {
-          "text": "有未成年子女"
-        }
+        "has_children": true,
+        "children_count_min": 1
       },
       "weight_tier": "中高概率",
       "weight": 8,
@@ -5828,16 +5816,16 @@
           "effects_text": "家庭资产减15000，子女能力加6，压力加5",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "家庭资产减15000",
-              "value": 0,
-              "reason": "family cash not implemented"
+              "type": "asset_change",
+              "target": "cash",
+              "value": -15000,
+              "reason": "高投入培养"
             },
             {
-              "type": "unsupported_effect",
-              "target": "子女能力加6",
+              "type": "child_relation_change",
+              "target": "child_ability",
               "value": 0,
-              "reason": "not implemented: 子女能力加6"
+              "ability_delta": 6
             },
             {
               "type": "attribute_change",
@@ -5856,16 +5844,16 @@
           "effects_text": "家庭资产减5000，子女能力加2",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "家庭资产减5000",
-              "value": 0,
-              "reason": "family cash not implemented"
+              "type": "asset_change",
+              "target": "cash",
+              "value": -5000,
+              "reason": "普通投入"
             },
             {
-              "type": "unsupported_effect",
-              "target": "子女能力加2",
+              "type": "child_relation_change",
+              "target": "child_ability",
               "value": 0,
-              "reason": "not implemented: 子女能力加2"
+              "ability_delta": 2
             }
           ],
           "requires_confirmation": false,
@@ -5878,16 +5866,16 @@
           "effects_text": "家庭资产不变，子女能力减2，亲子关系减3",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "子女能力减2",
+              "type": "child_relation_change",
+              "target": "child_ability",
               "value": 0,
-              "reason": "not implemented: 子女能力减2"
+              "ability_delta": -2
             },
             {
-              "type": "unsupported_effect",
-              "target": "亲子关系减3",
-              "value": 0,
-              "reason": "not implemented: 亲子关系减3"
+              "type": "parent_relation_change",
+              "target": "parent_child_relation",
+              "value": -3,
+              "reason": "亲子关系减3"
             }
           ],
           "requires_confirmation": false,
@@ -5896,11 +5884,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented",
-        "children system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E056子女教育支出\n\n年龄段：30到60岁\n触发条件：有未成年子女\n出现权重：中高概率\n是否可重复：可重复，冷却2年\n事件文本：孩子的教育需要更多投入，你需要决定家庭资源如何分配。\n选项一：高投入培养\n效果：家庭资产减15000，子女能力加6，压力加5\n选项二：普通投入\n效果：家庭资产减5000，子女能力加2\n选项三：低投入\n效果：家庭资产不变，子女能力减2，亲子关系减3",
       "pool_type": "normal"
     },
@@ -5919,9 +5904,10 @@
       "conditions": {
         "min_age": 25,
         "max_age": 60,
-        "unsupported_condition": {
-          "text": "已婚或稳定伴侣"
-        }
+        "relationship_status_in": [
+          "married",
+          "dating"
+        ]
       },
       "weight_tier": "中低概率",
       "weight": 3,
@@ -5936,16 +5922,15 @@
           "effects_text": "伴侣关系加5，家庭资产减10000，压力加5",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系加5",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系加5"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": 5
             },
             {
-              "type": "unsupported_effect",
-              "target": "家庭资产减10000",
-              "value": 0,
-              "reason": "family cash not implemented"
+              "type": "asset_change",
+              "target": "cash",
+              "value": -10000,
+              "reason": "家庭资产减10000"
             },
             {
               "type": "attribute_change",
@@ -5964,16 +5949,15 @@
           "effects_text": "伴侣关系减4，家庭资产减5000",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减4",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减4"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -4
             },
             {
-              "type": "unsupported_effect",
-              "target": "家庭资产减5000",
-              "value": 0,
-              "reason": "family cash not implemented"
+              "type": "asset_change",
+              "target": "cash",
+              "value": -5000,
+              "reason": "家庭资产减5000"
             }
           ],
           "requires_confirmation": false,
@@ -5986,10 +5970,9 @@
           "effects_text": "伴侣关系减8，压力加6",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减8",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减8"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -8
             },
             {
               "type": "attribute_change",
@@ -6004,11 +5987,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented",
-        "children system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E057伴侣失业\n\n年龄段：25到60岁\n触发条件：已婚或稳定伴侣\n出现权重：中低概率\n是否可重复：可重复，冷却5年\n事件文本：伴侣的工作出现问题，家庭收入受到影响。\n选项一：共同承担\n效果：伴侣关系加5，家庭资产减10000，压力加5\n选项二：要求尽快找工作\n效果：伴侣关系减4，家庭资产减5000\n选项三：发生争执\n效果：伴侣关系减8，压力加6",
       "pool_type": "normal"
     },
@@ -6028,9 +6008,10 @@
       "conditions": {
         "min_age": 28,
         "max_age": 65,
-        "unsupported_condition": {
-          "text": "已婚，伴侣关系低于35"
-        }
+        "relationship_status_in": [
+          "married"
+        ],
+        "partner_relation_max": 35
       },
       "weight_tier": "中概率",
       "weight": 5,
@@ -6045,10 +6026,9 @@
           "effects_text": "伴侣关系加8，个人资产减5000，压力加4",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系加8",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系加8"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": 8
             },
             {
               "type": "asset_change",
@@ -6073,16 +6053,15 @@
           "effects_text": "婚姻结束，资产按规则分割，幸福感减8",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "婚姻结束",
-              "value": 0,
-              "reason": "not implemented: 婚姻结束"
+              "type": "divorce_created",
+              "target": "spouse",
+              "value": 1
             },
             {
-              "type": "unsupported_effect",
-              "target": "资产按规则分割",
-              "value": 0,
-              "reason": "not implemented: 资产按规则分割"
+              "type": "asset_change",
+              "target": "cash",
+              "value": -5000,
+              "reason": "资产分割占位"
             },
             {
               "type": "attribute_change",
@@ -6101,10 +6080,9 @@
           "effects_text": "伴侣关系减5，压力加8",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "伴侣关系减5",
-              "value": 0,
-              "reason": "not implemented: 伴侣关系减5"
+              "type": "partner_relation_change",
+              "target": "partner_relation",
+              "value": -5
             },
             {
               "type": "attribute_change",
@@ -6119,10 +6097,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
-      "unsupported_reasons": [
-        "marriage/relationship system not implemented"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E058离婚危机\n\n年龄段：28到65岁\n触发条件：已婚，伴侣关系低于35\n出现权重：中概率\n是否可重复：可重复，冷却5年\n事件文本：你们的婚姻关系持续恶化，已经到了必须面对的地步。\n选项一：尝试修复\n效果：伴侣关系加8，个人资产减5000，压力加4\n选项二：协议离婚\n效果：婚姻结束，资产按规则分割，幸福感减8\n选项三：继续拖延\n效果：伴侣关系减5，压力加8\n\n十二、健康事件",
       "pool_type": "normal"
     },
@@ -7922,9 +7898,9 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
+      "implementation_status": "partial",
       "unsupported_reasons": [
-        "children system not implemented"
+        "advanced family/legal system placeholder"
       ],
       "source_text": "E077子女成家\n\n年龄段：45到80岁\n触发条件：有成年子女\n出现权重：中概率\n是否可重复：按子女数量触发\n事件文本：你的孩子进入人生新阶段，开始组建自己的家庭。\n选项一：提供经济支持\n效果：个人资产减30000，子女关系加6\n选项二：精神支持\n效果：子女关系加3，资产不变\n选项三：不干涉\n效果：子女独立性加3，关系小幅变化",
       "pool_type": "normal"
@@ -8024,9 +8000,9 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
+      "implementation_status": "partial",
       "unsupported_reasons": [
-        "children system not implemented"
+        "advanced family/legal system placeholder"
       ],
       "source_text": "E078孙辈出生\n\n年龄段：50到90岁\n触发条件：有已婚成年子女\n出现权重：中概率\n是否可重复：可重复\n事件文本：家里迎来了新一代，你成为了祖辈。\n选项一：帮忙照顾\n效果：幸福感加6，健康减2，子女关系加4\n选项二：经济支持\n效果：个人资产减20000，子女关系加5\n选项三：保持距离\n效果：健康不变，子女关系减1",
       "pool_type": "normal"
@@ -8148,7 +8124,7 @@
       "affects_future": true,
       "implementation_status": "partial",
       "unsupported_reasons": [
-        "contains unsupported_effect"
+        "advanced family/legal system placeholder"
       ],
       "source_text": "E079遗产规划\n\n年龄段：60岁以上\n触发条件：个人资产高于10000，或出现自然死亡前兆\n出现权重：中概率\n是否可重复：可重复，冷却5年\n事件文本：你开始思考自己的财产以后应该如何分配。\n选项一：按法定规则\n效果：无设置时由伴侣和后代继承，继承税20%\n选项二：偏向伴侣\n效果：伴侣继承比例提高，子女关系可能下降\n选项三：偏向子女\n效果：子女继承比例提高，伴侣关系可能下降\n选项四：平均分配\n效果：家庭关系较稳定，争产概率降低",
       "pool_type": "normal"
@@ -8252,9 +8228,9 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "planned",
+      "implementation_status": "partial",
       "unsupported_reasons": [
-        "system_only event"
+        "advanced family/legal system placeholder"
       ],
       "source_text": "E080亲属争产\n\n年龄段：死亡后结算事件\n触发条件：遗产较多且未提前规划\n出现权重：中概率\n是否可重复：不可重复\n事件文本：你去世后，亲属之间因为遗产分配产生争执。\n选项一：按法律处理\n效果：遗产扣除20%税后分配，亲属关系下降\n选项二：按遗嘱处理\n效果：如果存在遗嘱，则按遗嘱分配，争产概率降低\n选项三：进入后代人生\n效果：玩家可选择出生到后代的后代，或继承某位后代继续人生",
       "pool_type": "system"

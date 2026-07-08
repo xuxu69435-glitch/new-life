@@ -10,6 +10,24 @@ export function YearResultPanel() {
       {result ? (
         <>
           <p className="narrative-text">{result.narrative_text}</p>
+          {result.family_changes && Object.keys(result.family_changes).length > 0 ? (
+            <div className="change-block">
+              <h3>Family changes</h3>
+              {result.relationship_status_before && result.relationship_status_after ? (
+                <p>
+                  Status: {result.relationship_status_before} → {result.relationship_status_after}
+                </p>
+              ) : null}
+              {result.married_this_year ? <p className="muted-text">Married this year.</p> : null}
+              {result.child_born_this_year ? <p className="muted-text">Child born this year.</p> : null}
+              {result.partner_relation_delta !== 0 ? (
+                <p>Partner relation: {result.partner_relation_delta > 0 ? "+" : ""}{result.partner_relation_delta}</p>
+              ) : null}
+              {result.family_pressure_delta !== 0 ? (
+                <p>Family pressure: {result.family_pressure_delta > 0 ? "+" : ""}{result.family_pressure_delta}</p>
+              ) : null}
+            </div>
+          ) : null}
           {result.pending_random_event ? (
             <div className="change-block">
               <h3>Pending random event</h3>

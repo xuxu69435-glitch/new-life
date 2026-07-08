@@ -27,6 +27,7 @@ class RuleValidator:
         self._validate_health_rules(rules)
         self._validate_education_rules(rules)
         self._validate_career_rules(rules)
+        self._validate_family_rules(rules)
         self._validate_random_events(rules)
         self._validate_inheritance(rules)
 
@@ -113,6 +114,41 @@ class RuleValidator:
             if float(path["base_annual_income"]) < 0:
                 raise RuleValidationError(
                     f"Career path '{path_id}' base_annual_income cannot be less than 0."
+                )
+
+    def _validate_family_rules(self, rules: dict) -> None:
+        family = rules.get("family")
+        if not family:
+            raise RuleValidationError("Rule config must include family rules.")
+
+        defaults = family.get("defaults")
+        if not defaults:
+            raise RuleValidationError("Family rules must include defaults.")
+
+        for key in (
+            "parent_child_relation",
+            "father_relation",
+            "mother_relation",
+            "partner_relation",
+            "family_pressure",
+        ):
+            if key not in defaults:
+                raise RuleValidationError(f"Family defaults must include {key}.")
+            value = int(defaults[key])
+            if value < 0 or value > 100:
+                raise RuleValidationError(f"Family default {key} must be between 0 and 100.")
+
+        for section, min_key, max_key in (
+            ("dating", "min_age", "max_age"),
+            ("marriage", "min_age", "max_age"),
+            ("childbirth", "min_age", "max_age"),
+        ):
+            block = family.get(section)
+            if not block:
+                raise RuleValidationError(f"Family rules must include {section}.")
+            if int(block[min_key]) > int(block[max_key]):
+                raise RuleValidationError(
+                    f"Family {section} min_age cannot exceed max_age."
                 )
 
     def _validate_inheritance(self, rules: dict) -> None:

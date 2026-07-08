@@ -33,6 +33,22 @@ ALLOWED_CONDITION_KEYS = {
     "system_only",
     "unsupported_condition",
     "pool",
+    "relationship_status_in",
+    "relationship_status",
+    "partner_relation_min",
+    "partner_relation_max",
+    "has_spouse",
+    "has_children",
+    "children_count_min",
+    "children_count_max",
+    "family_pressure_min",
+    "family_pressure_max",
+    "parent_child_relation_min",
+    "parent_child_relation_max",
+    "father_relation_min",
+    "mother_relation_min",
+    "age_min",
+    "age_max",
 }
 
 ALLOWED_EFFECT_TYPES = {
@@ -43,6 +59,18 @@ ALLOWED_EFFECT_TYPES = {
     "narrative_tag",
     "flag_set",
     "unsupported_effect",
+    "family_relation_change",
+    "relationship_status_change",
+    "partner_relation_change",
+    "parent_relation_change",
+    "family_pressure_change",
+    "child_created",
+    "child_relation_change",
+    "spouse_created",
+    "marriage_created",
+    "divorce_created",
+    "family_history_recorded",
+    "partner_created",
 }
 
 DIRECT_DEATH_EVENT_IDS = {"E067", "E068", "E070"}
