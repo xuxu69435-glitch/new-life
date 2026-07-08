@@ -122,6 +122,62 @@ class GameCommandService:
     def get_timeline(self, life_id: str) -> list[YearResult]:
         return self.save_service.get_timeline(life_id)
 
+    def list_saves(self) -> list[dict[str, Any]]:
+        return [record.model_dump() for record in self.save_service.list_saves()]
+
+    def get_save_record(self, life_id: str) -> dict[str, Any]:
+        record = self.save_service.get_save_record(life_id)
+        if record is None:
+            raise KeyError(life_id)
+        state = self.save_service.get_life_state(life_id)
+        return {
+            **record.model_dump(),
+            "current_state": state.model_dump(),
+        }
+
+    def get_timeline_entries(
+        self,
+        life_id: str,
+        *,
+        age_min: int | None = None,
+        age_max: int | None = None,
+        entry_type: str | None = None,
+    ) -> list[dict[str, Any]]:
+        entries = self.save_service.get_timeline_entries(
+            life_id,
+            age_min=age_min,
+            age_max=age_max,
+            entry_type=entry_type,
+        )
+        return [entry.model_dump() for entry in entries]
+
+    def get_year_snapshot(self, life_id: str, age: int) -> dict[str, Any]:
+        snapshot = self.save_service.get_year_snapshot(life_id, age)
+        if snapshot is None:
+            raise KeyError(f"No snapshot for age {age}")
+        return snapshot.model_dump()
+
+    def get_year_detail(self, life_id: str, age: int) -> dict[str, Any]:
+        detail = self.save_service.get_year_detail(life_id, age)
+        if detail is None:
+            raise KeyError(f"No year detail for age {age}")
+        return detail
+
+    def get_year_narrative(self, life_id: str, age: int) -> dict[str, Any]:
+        narrative = self.save_service.get_year_narrative(life_id, age)
+        if narrative is None:
+            raise KeyError(f"No narrative for age {age}")
+        return narrative
+
+    def get_year_result_by_age(self, life_id: str, age: int) -> dict[str, Any]:
+        result = self.save_service.get_year_result_by_age(life_id, age)
+        if result is None:
+            raise KeyError(f"No year result for age {age}")
+        return result
+
+    def get_key_milestones(self, life_id: str) -> list[dict[str, Any]]:
+        return self.save_service.get_key_milestones(life_id)
+
     def get_family_tree(self, life_id: str) -> dict[str, Any]:
         state = self.save_service.get_life_state(life_id)
         return {"life_id": life_id, "family": state.family}

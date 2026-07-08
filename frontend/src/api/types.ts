@@ -180,6 +180,47 @@ export type AchievementStateResponse = {
   unlocked_count: number;
 };
 
+export type TimelineEntry = {
+  entry_id: string;
+  life_id: string;
+  age: number;
+  title: string;
+  summary: string;
+  entry_type: string;
+  category: string;
+  source_module: string;
+  source_id: string;
+  importance: number;
+  tags: string[];
+  display_text: string;
+  related_snapshot_id: string;
+  created_at: string;
+};
+
+export type TimelineEntriesResponse = {
+  life_id: string;
+  entries: TimelineEntry[];
+  count: number;
+};
+
+export type YearDetailResponse = {
+  life_id: string;
+  age: number;
+  snapshot_id: string;
+  annual_summary: string;
+  narrative_result: Record<string, unknown> | null;
+  state_changes: {
+    attributes: Record<string, number>;
+    health: Record<string, number>;
+    assets: Record<string, number>;
+  };
+  events: TimelineEntry[];
+  achievements: Record<string, unknown>;
+  mainline: Record<string, unknown>;
+  milestones: Array<Record<string, unknown>>;
+  year_result: YearResult;
+};
+
 export type LifeStateResponse = {
   state: LifeState;
   available_choices: AvailableChoice[];

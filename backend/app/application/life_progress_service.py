@@ -25,8 +25,13 @@ class LifeProgressService:
             player_choices,
             rules,
         )
-        self.save_service.save_life_state(next_state)
-        self.save_service.append_timeline(result)
+        self.save_service.save_life_state(next_state, rules=rules)
+        self.save_service.persist_year_record(
+            state,
+            next_state,
+            result,
+            inheritance_result=inheritance_result,
+        )
         if inheritance_result is not None:
             self.save_service.save_inheritance(life_id, inheritance_result)
         return result

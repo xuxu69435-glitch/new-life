@@ -30,6 +30,7 @@ export function ChoicePanel({ lifeId, disabled }: ChoicePanelProps) {
       setAvailableChoices(result.next_available_choices);
       void queryClient.invalidateQueries({ queryKey: ["life", lifeId] });
       void queryClient.invalidateQueries({ queryKey: ["timeline", lifeId] });
+      void queryClient.invalidateQueries({ queryKey: ["timeline-entries", lifeId] });
       void queryClient.invalidateQueries({ queryKey: ["family", lifeId] });
       void queryClient.invalidateQueries({ queryKey: ["inheritance", lifeId] });
     },

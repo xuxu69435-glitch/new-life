@@ -10,6 +10,7 @@ from app.api.legal_api import router as legal_router
 from app.api.mainline_api import router as mainline_router
 from app.api.person_api import router as person_router
 from app.api.rules_api import include_dev_rules_router
+from app.api.save_api import router as save_router
 from app.api.timeline_api import router as timeline_router
 from app.infrastructure.config import settings
 from app.rules.rule_loader import RuleLoader
@@ -25,6 +26,7 @@ app.add_middleware(
 )
 
 app.include_router(game_router)
+app.include_router(save_router)
 app.include_router(person_router)
 app.include_router(timeline_router)
 app.include_router(family_router)

@@ -246,6 +246,44 @@ button {
   color: #526061;
 }
 
+.timeline-filters {
+  margin-bottom: 12px;
+}
+
+.timeline-filters select {
+  margin-left: 8px;
+}
+
+.timeline-year-toggle {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.timeline-year-highlight {
+  border-left: 3px solid #c45c3e;
+  padding-left: 12px;
+}
+
+.timeline-highlights {
+  margin-top: 8px;
+}
+
+.timeline-highlight-item {
+  color: #8b3a2f;
+  font-size: 0.95rem;
+}
+
+.year-detail-block {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f8f6f0;
+}
+
 .data-preview {
   overflow: auto;
   max-height: 240px;

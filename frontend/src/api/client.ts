@@ -8,6 +8,8 @@ import type {
   PendingRandomEventResponse,
   PlayableHeirsResponse,
   RandomEventChoiceResponse,
+  TimelineEntriesResponse,
+  YearDetailResponse,
   YearResult,
 } from "./types";
 
@@ -81,6 +83,22 @@ export const apiClient = {
 
   getTimeline(lifeId: string): Promise<YearResult[]> {
     return request<YearResult[]>(`/timelines/${lifeId}`);
+  },
+
+  getTimelineEntries(
+    lifeId: string,
+    params?: { ageMin?: number; ageMax?: number; entryType?: string },
+  ): Promise<TimelineEntriesResponse> {
+    const search = new URLSearchParams();
+    if (params?.ageMin != null) search.set("age_min", String(params.ageMin));
+    if (params?.ageMax != null) search.set("age_max", String(params.ageMax));
+    if (params?.entryType) search.set("entry_type", params.entryType);
+    const query = search.toString();
+    return request<TimelineEntriesResponse>(`/timelines/${lifeId}/entries${query ? `?${query}` : ""}`);
+  },
+
+  getYearDetail(lifeId: string, age: number): Promise<YearDetailResponse> {
+    return request<YearDetailResponse>(`/timelines/${lifeId}/years/${age}/detail`);
   },
 
   getFamily(lifeId: string): Promise<Record<string, unknown>> {
