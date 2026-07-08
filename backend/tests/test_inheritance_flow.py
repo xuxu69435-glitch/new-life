@@ -12,8 +12,12 @@ def test_inheritance_module_only_runs_after_death_confirmed(life_state, rules) -
 
     assert context.result_collector.inheritance_result is None
 
-    context.result_collector.confirm_death("test death")
+    context.result_collector.confirm_death("test death", death_type="natural_death")
     InheritanceService().run(context)
 
     assert context.result_collector.inheritance_result is not None
-    assert context.result_collector.inheritance_result["status"] == "placeholder"
+    assert context.result_collector.inheritance_result["status"] in {
+        "settled",
+        "zero_estate",
+        "unclaimed",
+    }

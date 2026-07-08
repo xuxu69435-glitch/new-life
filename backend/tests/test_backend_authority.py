@@ -10,8 +10,9 @@ def test_frontend_does_not_hold_core_probability_or_settlement_rules() -> None:
         "Math.random",
         "direct_death_probability_limit",
         "natural_death_probability",
-        "tax_rate",
         "inheritance_tax",
+        "partner_share_ratio",
+        "descendant_share_ratio",
     ]
     source = "\n".join(path.read_text(encoding="utf-8") for path in frontend_src.rglob("*.ts*"))
 

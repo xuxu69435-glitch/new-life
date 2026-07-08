@@ -162,6 +162,10 @@ class ResultCollector:
         for key, delta in self.changed_assets.items():
             next_state.assets[key] = float(next_state.assets.get(key, 0.0)) + delta
 
+        from app.modules.assets.models import AssetState
+
+        next_state.assets = AssetState.from_life_state_dict(next_state.assets).to_life_state_dict()
+
         for key, value in self.changed_flags.items():
             next_state.flags[key] = value
 
@@ -203,6 +207,7 @@ class ResultCollector:
             random_event_attribute_changes=dict(self.random_event_attribute_changes),
             random_event_health_changes=dict(self.random_event_health_changes),
             random_event_asset_changes=dict(self.random_event_asset_changes),
+            inheritance_result=self.inheritance_result,
             occurred_events=occurred_events,
             narrative_text="\n".join(self.narrative_lines),
             next_available_choices=next_available_choices,

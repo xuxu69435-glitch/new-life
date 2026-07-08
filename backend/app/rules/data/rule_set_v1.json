@@ -30,7 +30,10 @@
   },
   "default_assets": {
     "cash": 0.0,
-    "debt": 0.0
+    "property_value": 0.0,
+    "debt": 0.0,
+    "net_worth": 0.0,
+    "asset_transactions": []
   },
   "health_lifetime": {
     "health_score": {
@@ -285,7 +288,17 @@
   },
   "inheritance": {
     "tax_rate": 0.2,
-    "default_heirs": ["partner", "descendants"]
+    "default_rules_enabled": true,
+    "partner_share_ratio": 0.4,
+    "descendant_share_ratio": 0.6,
+    "no_partner_to_descendants": true,
+    "no_descendants_to_partner": true,
+    "no_heirs_status": "unclaimed",
+    "continue_as_heir_enabled": true,
+    "continue_as_heir": {
+      "start_age": 0,
+      "inherit_cash_to_new_life": true
+    }
   },
   "education": {
     "default_track": "not_started",

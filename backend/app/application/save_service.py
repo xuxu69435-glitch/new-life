@@ -1,6 +1,8 @@
 from uuid import uuid4
 
 from app.engine.simulation_context import LifeState, YearResult
+from app.modules.assets.models import AssetState
+from app.modules.family.rules import build_default_family_state
 from app.modules.health.rules import build_default_health_state
 
 
@@ -9,24 +11,61 @@ class SaveService:
         self._states: dict[str, LifeState] = {}
         self._timeline: dict[str, list[YearResult]] = {}
         self._inheritance: dict[str, dict] = {}
+        self._heir_continuations: dict[str, dict] = {}
 
-    def create_life(self, rule_version: str, rules: dict) -> LifeState:
+    def create_life(
+        self,
+        rule_version: str,
+        rules: dict,
+        *,
+        person_id: str | None = None,
+        family: dict | None = None,
+        assets: dict | None = None,
+        generation: int | None = None,
+        age: int = 0,
+        source_life_id: str | None = None,
+        inheritance_amount: float | None = None,
+    ) -> LifeState:
         life_id = str(uuid4())
-        person_id = str(uuid4())
+        resolved_person_id = person_id or str(uuid4())
+        default_family = build_default_family_state(rules)
+        if family is not None:
+            family_state = family
+        else:
+            family_state = default_family.to_life_state_dict()
+        if generation is not None:
+            family_state["generation"] = generation
+
+        default_assets = AssetState.from_life_state_dict(
+            assets or rules.get("default_assets", {}),
+            rules,
+        ).to_life_state_dict()
+        if inheritance_amount is not None:
+            default_assets["cash"] = float(default_assets.get("cash", 0.0)) + float(inheritance_amount)
+            default_assets["net_worth"] = (
+                float(default_assets.get("cash", 0.0))
+                + float(default_assets.get("property_value", 0.0))
+                - float(default_assets.get("debt", 0.0))
+            )
+
         state = LifeState(
             life_id=life_id,
-            person_id=person_id,
-            age=0,
+            person_id=resolved_person_id,
+            age=age,
             life_stage="infant",
             attributes=dict(rules.get("default_attributes", {})),
             health=build_default_health_state(rules).to_life_state_dict(),
-            family={"relations": []},
+            family=family_state,
             education={"track": rules.get("education", {}).get("default_track", "not_started")},
             career={"title": "none", "income": 0.0},
-            assets=dict(rules.get("default_assets", {})),
+            assets=default_assets,
             flags={},
             rule_version=rule_version,
         )
+        if source_life_id is not None:
+            state.flags["source_life_id"] = source_life_id
+        if inheritance_amount is not None:
+            state.flags["inheritance_amount"] = inheritance_amount
         self.save_life_state(state)
         self._timeline[state.life_id] = []
         return state
@@ -54,3 +93,9 @@ class SaveService:
 
     def get_inheritance(self, life_id: str) -> dict:
         return self._inheritance.get(life_id, {"status": "not_available"})
+
+    def save_heir_continuation(self, source_life_id: str, record: dict) -> None:
+        self._heir_continuations[source_life_id] = record
+
+    def get_heir_continuation(self, source_life_id: str) -> dict | None:
+        return self._heir_continuations.get(source_life_id)

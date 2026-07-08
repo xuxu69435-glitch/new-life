@@ -73,9 +73,28 @@ class RuleValidator:
             raise RuleValidationError("Inheritance rules must include tax_rate.")
 
         tax_rate = float(inheritance["tax_rate"])
+        if tax_rate < 0 or tax_rate > 1:
+            raise RuleValidationError("Inheritance tax_rate must be between 0 and 1.")
         if tax_rate != 0.2:
             raise RuleValidationError(
                 f"Inheritance tax_rate must be 0.2 for the current scaffold, got {tax_rate}."
+            )
+
+        if "partner_share_ratio" not in inheritance:
+            raise RuleValidationError("Inheritance rules must include partner_share_ratio.")
+        if "descendant_share_ratio" not in inheritance:
+            raise RuleValidationError("Inheritance rules must include descendant_share_ratio.")
+
+        partner_ratio = float(inheritance["partner_share_ratio"])
+        descendant_ratio = float(inheritance["descendant_share_ratio"])
+        if abs(partner_ratio + descendant_ratio - 1.0) > 0.0001:
+            raise RuleValidationError(
+                "Inheritance partner_share_ratio and descendant_share_ratio must sum to 1."
+            )
+
+        if "continue_as_heir_enabled" not in inheritance:
+            raise RuleValidationError(
+                "Inheritance rules must include continue_as_heir_enabled."
             )
 
     def _validate_random_events(self, rules: dict) -> None:

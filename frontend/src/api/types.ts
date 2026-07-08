@@ -55,9 +55,47 @@ export type YearResult = {
   random_event_attribute_changes: Record<string, number>;
   random_event_health_changes: Record<string, number>;
   random_event_asset_changes: Record<string, number>;
+  inheritance_result: InheritanceResult | null;
   occurred_events: SimulationEvent[];
   narrative_text: string;
   next_available_choices: AvailableChoice[];
+};
+
+export type HeirShare = {
+  person_id: string;
+  relation: string;
+  share_ratio: number;
+  amount: number;
+};
+
+export type InheritanceResult = {
+  life_id: string;
+  deceased_person_id: string;
+  gross_estate: number;
+  tax_rate: number;
+  tax_amount: number;
+  net_estate: number;
+  heirs: HeirShare[];
+  distribution: Record<string, number>;
+  unclaimed_amount: number;
+  status: string;
+  created_from_death_type: string | null;
+};
+
+export type PlayableHeir = {
+  person_id: string;
+  name: string;
+  relation: string;
+  inheritance_amount: number;
+  generation: number;
+  start_age: number;
+};
+
+export type PlayableHeirsResponse = {
+  life_id: string;
+  source_life_id?: string;
+  playable_heirs: PlayableHeir[];
+  status: string;
 };
 
 export type LifeStateResponse = {

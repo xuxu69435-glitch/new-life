@@ -35,7 +35,7 @@ class LifeState(BaseModel):
     family: dict[str, Any] = Field(default_factory=dict)
     education: dict[str, Any] = Field(default_factory=dict)
     career: dict[str, Any] = Field(default_factory=dict)
-    assets: dict[str, float] = Field(default_factory=dict)
+    assets: dict[str, Any] = Field(default_factory=dict)
     flags: dict[str, Any] = Field(default_factory=dict)
     rule_version: str = "v1"
 
@@ -68,6 +68,7 @@ class YearResult(BaseModel):
     random_event_attribute_changes: dict[str, int] = Field(default_factory=dict)
     random_event_health_changes: dict[str, int] = Field(default_factory=dict)
     random_event_asset_changes: dict[str, float] = Field(default_factory=dict)
+    inheritance_result: dict[str, Any] | None = None
     occurred_events: list[SimulationEvent] = Field(default_factory=list)
     narrative_text: str = ""
     next_available_choices: list[dict[str, Any]] = Field(default_factory=list)

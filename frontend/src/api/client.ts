@@ -1,4 +1,4 @@
-import type { LifeStateResponse, YearResult } from "./types";
+import type { InheritanceResult, LifeStateResponse, PlayableHeirsResponse, YearResult } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -46,7 +46,18 @@ export const apiClient = {
     return request<Record<string, unknown>>(`/families/${lifeId}`);
   },
 
-  getInheritance(lifeId: string): Promise<Record<string, unknown>> {
-    return request<Record<string, unknown>>(`/inheritance/${lifeId}`);
+  getInheritance(lifeId: string): Promise<InheritanceResult> {
+    return request<InheritanceResult>(`/inheritance/${lifeId}`);
+  },
+
+  getPlayableHeirs(lifeId: string): Promise<PlayableHeirsResponse> {
+    return request<PlayableHeirsResponse>(`/inheritance/${lifeId}/playable-heirs`);
+  },
+
+  continueAsHeir(lifeId: string, heirPersonId: string): Promise<Record<string, unknown>> {
+    return request<Record<string, unknown>>(`/inheritance/${lifeId}/continue-as-heir`, {
+      method: "POST",
+      body: JSON.stringify({ heir_person_id: heirPersonId }),
+    });
   },
 };
