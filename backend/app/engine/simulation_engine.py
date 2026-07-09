@@ -20,6 +20,8 @@ from app.modules.mainline.service import MainlineService
 from app.modules.achievement.service import AchievementService
 from app.modules.narrative.service import NarrativeService
 from app.modules.random_events.service import RandomEventsService
+from app.modules.romance.service import RomanceService
+from app.modules.social.service import SocialService
 
 
 class SimulationEngine:
@@ -31,6 +33,8 @@ class SimulationEngine:
             EducationService(),
             CareerService(),
             FamilyService(),
+            SocialService(),
+            RomanceService(),
             AssetsService(),
             HealthService(),
             RandomEventsService(),
@@ -76,6 +80,8 @@ class SimulationEngine:
         context.result_collector.bind_legal_context(current_state)
         context.result_collector.bind_mainline_context(current_state)
         context.result_collector.bind_achievement_context(current_state)
+        context.result_collector.bind_social_context(current_state)
+        context.result_collector.bind_romance_context(current_state)
 
         for module in self.annual_modules:
             module.run(context)
@@ -125,6 +131,8 @@ class SimulationEngine:
         context.result_collector.bind_legal_context(current_state)
         context.result_collector.bind_mainline_context(current_state)
         context.result_collector.bind_achievement_context(current_state)
+        context.result_collector.bind_social_context(current_state)
+        context.result_collector.bind_romance_context(current_state)
 
         random_events_module = RandomEventsService()
         choice_result = random_events_module.submit_choice(context, choice_id)
@@ -170,6 +178,8 @@ class SimulationEngine:
         context.result_collector.bind_legal_context(current_state)
         context.result_collector.bind_mainline_context(current_state)
         context.result_collector.bind_achievement_context(current_state)
+        context.result_collector.bind_social_context(current_state)
+        context.result_collector.bind_romance_context(current_state)
 
         legal_module = LegalService()
         choice_result = legal_module.submit_choice(context, choice_id)

@@ -43,6 +43,23 @@ class SimulationEventType(str, Enum):
     LEGAL_CHOICE_APPLIED = "LegalChoiceApplied"
     MAINLINE_STATE_UPDATE_REQUESTED = "MainlineStateUpdateRequested"
     ACHIEVEMENT_STATE_UPDATE_REQUESTED = "AchievementStateUpdateRequested"
+    SOCIAL_STATE_UPDATE_REQUESTED = "SocialStateUpdateRequested"
+    SOCIAL_PERSON_CREATED = "SocialPersonCreated"
+    SOCIAL_RELATIONSHIP_CREATED = "SocialRelationshipCreated"
+    SOCIAL_RELATIONSHIP_CHANGE_REQUESTED = "SocialRelationshipChangeRequested"
+    SOCIAL_RELATIONSHIP_STATUS_CHANGE_REQUESTED = "SocialRelationshipStatusChangeRequested"
+    SOCIAL_FLAG_SET_REQUESTED = "SocialFlagSetRequested"
+    SOCIAL_FLAG_REMOVE_REQUESTED = "SocialFlagRemoveRequested"
+    ROMANCE_STATE_UPDATE_REQUESTED = "RomanceStateUpdateRequested"
+    ROMANCE_CANDIDATE_CREATED = "RomanceCandidateCreated"
+    ROMANCE_CANDIDATE_CHANGE_REQUESTED = "RomanceCandidateChangeRequested"
+    ROMANCE_RELATIONSHIP_STARTED = "RomanceRelationshipStarted"
+    ROMANCE_RELATIONSHIP_CHANGE_REQUESTED = "RomanceRelationshipChangeRequested"
+    ROMANCE_RELATIONSHIP_STATUS_CHANGE_REQUESTED = "RomanceRelationshipStatusChangeRequested"
+    ROMANCE_RELATIONSHIP_ENDED = "RomanceRelationshipEnded"
+    ROMANCE_FLAG_SET_REQUESTED = "RomanceFlagSetRequested"
+    ROMANCE_FLAG_REMOVE_REQUESTED = "RomanceFlagRemoveRequested"
+    ROMANCE_TO_FAMILY_SIGNAL = "RomanceToFamilySignal"
 
 
 class LifeState(BaseModel):
@@ -64,6 +81,8 @@ class LifeState(BaseModel):
     pending_legal_event: dict[str, Any] | None = None
     mainline: dict[str, Any] = Field(default_factory=dict)
     achievements: dict[str, Any] = Field(default_factory=dict)
+    social: dict[str, Any] = Field(default_factory=dict)
+    romance: dict[str, Any] = Field(default_factory=dict)
     rule_version: str = "v1"
 
 
@@ -140,6 +159,17 @@ class YearResult(BaseModel):
     achievement_points_gained: int = 0
     milestones_this_year: list[dict[str, Any]] = Field(default_factory=list)
     achievement_narrative: list[str] = Field(default_factory=list)
+    social_changes: dict[str, Any] = Field(default_factory=dict)
+    new_social_relationships: list[dict[str, Any]] = Field(default_factory=list)
+    changed_social_relationships: list[dict[str, Any]] = Field(default_factory=list)
+    removed_social_relationships: list[str] = Field(default_factory=list)
+    social_narrative: list[str] = Field(default_factory=list)
+    romance_changes: dict[str, Any] = Field(default_factory=dict)
+    new_romantic_candidates: list[dict[str, Any]] = Field(default_factory=list)
+    current_romantic_relationship: dict[str, Any] | None = None
+    ended_romantic_relationships: list[str] = Field(default_factory=list)
+    romance_narrative: list[str] = Field(default_factory=list)
+    romance_to_family_signal: dict[str, Any] | None = None
 
 
 class SimulationContext(BaseModel):

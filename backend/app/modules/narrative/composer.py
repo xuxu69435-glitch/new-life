@@ -383,6 +383,11 @@ class AnnualNarrativeComposer:
                 )
             )
 
+        if input_data.social_narrative:
+            texts["social"] = list(input_data.social_narrative)
+        if input_data.romance_narrative:
+            texts["romance"] = list(input_data.romance_narrative)
+
         return {key: value for key, value in texts.items() if value}
 
     def _build_sections(
@@ -455,6 +460,23 @@ class AnnualNarrativeComposer:
                     section_id=self.SECTION_FAMILY,
                     title=self.SECTION_TITLES[self.SECTION_FAMILY],
                     content="\n".join(module_texts["family"]),
+                )
+            )
+
+        if module_texts.get("social"):
+            sections.append(
+                DisplaySection(
+                    section_id="social",
+                    title="社交关系",
+                    content="\n".join(module_texts["social"]),
+                )
+            )
+        if module_texts.get("romance"):
+            sections.append(
+                DisplaySection(
+                    section_id="romance",
+                    title="情感恋爱",
+                    content="\n".join(module_texts["romance"]),
                 )
             )
 

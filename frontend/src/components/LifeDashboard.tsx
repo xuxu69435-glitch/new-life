@@ -9,6 +9,8 @@ import { AnnualNarrativeFromStore } from "./AnnualNarrativePanel";
 import { ChoicePanel } from "./ChoicePanel";
 import { FamilyPanel } from "./FamilyPanel";
 import { InheritancePanel } from "./InheritancePanel";
+import { SocialPanel } from "./SocialPanel";
+import { RomancePanel } from "./RomancePanel";
 import { LegalPanel } from "./LegalPanel";
 import { MainlinePanel } from "./MainlinePanel";
 import { RandomEventPanel } from "./RandomEventPanel";
@@ -76,6 +78,8 @@ export function LifeDashboard({ onExit }: LifeDashboardProps) {
           </section>
           <aside className="side-column">
             <AchievementPanel lifeId={lifeId} disabled={lifeQuery.data.state.is_dead} />
+            <SocialPanel state={lifeQuery.data.state} />
+            <RomancePanel state={lifeQuery.data.state} />
             <FamilyPanel lifeId={lifeId} />
             <InheritancePanel lifeId={lifeId} />
           </aside>

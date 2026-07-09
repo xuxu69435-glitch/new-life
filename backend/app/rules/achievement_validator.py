@@ -15,6 +15,8 @@ class AchievementValidator:
         "legal",
         "legacy",
         "mainline",
+        "social",
+        "romance",
         "special",
     }
     ALLOWED_TIERS = {"bronze", "silver", "gold", "legendary"}

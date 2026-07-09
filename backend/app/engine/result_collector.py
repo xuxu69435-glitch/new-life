@@ -7,6 +7,12 @@ from app.modules.health.sync import apply_post_health_changes
 from app.modules.achievement.models import AchievementState
 from app.modules.legal.models import LegalState
 from app.modules.mainline.models import MainlineState
+from app.modules.romance.events import RomanceEventProcessor
+from app.modules.romance.models import RomanceState
+from app.modules.romance.summary import build_romance_narrative_lines, build_romance_summary
+from app.modules.social.events import SocialEventProcessor
+from app.modules.social.models import SocialState
+from app.modules.social.summary import build_social_summary, build_social_narrative_lines
 
 
 class ResultCollector:
@@ -71,6 +77,13 @@ class ResultCollector:
         self.achievement_points_gained: int = 0
         self.milestones_this_year: list[dict[str, Any]] = []
         self.achievement_narrative: list[str] = []
+        self.social_processor = SocialEventProcessor()
+        self._social_working: SocialState | None = None
+        self._social_state_age: int = 0
+        self.romance_processor = RomanceEventProcessor()
+        self._romance_working: RomanceState | None = None
+        self._romance_state_age: int = 0
+        self.romance_to_family_signal: dict[str, Any] | None = None
         self._processed_event_ids: set[int] = set()
 
     @property
@@ -142,6 +155,18 @@ class ResultCollector:
         if self._achievement_working is None:
             self._achievement_working = AchievementState.from_life_state_dict(state.achievements)
 
+    def bind_social_context(self, state: LifeState) -> None:
+        self._social_state_age = state.age
+        if self._social_working is None:
+            base = SocialState.from_life_state_dict(state.social)
+            self._social_working = self.social_processor.initialize(base)
+
+    def bind_romance_context(self, state: LifeState) -> None:
+        self._romance_state_age = state.age
+        if self._romance_working is None:
+            base = RomanceState.from_life_state_dict(state.romance)
+            self._romance_working = self.romance_processor.initialize(base)
+
     def snapshot_state(self, state: LifeState, rules: dict | None = None) -> LifeState:
         snapshot = state.model_copy(deep=True)
         snapshot.age += 1
@@ -185,6 +210,10 @@ class ResultCollector:
             snapshot.mainline = self._mainline_working.to_life_state_dict()
         if self._achievement_working is not None:
             snapshot.achievements = self._achievement_working.to_life_state_dict()
+        if self._social_working is not None:
+            snapshot.social = self._social_working.to_life_state_dict()
+        if self._romance_working is not None:
+            snapshot.romance = self._romance_working.to_life_state_dict()
         if self.death_reason is not None:
             snapshot.is_dead = True
             snapshot.death_reason = self.death_reason
@@ -314,6 +343,30 @@ class ResultCollector:
                 SimulationEventType.DIVORCE_CREATED,
             }:
                 self._apply_family_event(event.event_type, payload)
+            elif event.event_type in {
+                SimulationEventType.SOCIAL_STATE_UPDATE_REQUESTED,
+                SimulationEventType.SOCIAL_PERSON_CREATED,
+                SimulationEventType.SOCIAL_RELATIONSHIP_CREATED,
+                SimulationEventType.SOCIAL_RELATIONSHIP_CHANGE_REQUESTED,
+                SimulationEventType.SOCIAL_RELATIONSHIP_STATUS_CHANGE_REQUESTED,
+                SimulationEventType.SOCIAL_FLAG_SET_REQUESTED,
+                SimulationEventType.SOCIAL_FLAG_REMOVE_REQUESTED,
+            }:
+                self._apply_social_event(event.event_type, payload)
+            elif event.event_type in {
+                SimulationEventType.ROMANCE_STATE_UPDATE_REQUESTED,
+                SimulationEventType.ROMANCE_CANDIDATE_CREATED,
+                SimulationEventType.ROMANCE_CANDIDATE_CHANGE_REQUESTED,
+                SimulationEventType.ROMANCE_RELATIONSHIP_STARTED,
+                SimulationEventType.ROMANCE_RELATIONSHIP_CHANGE_REQUESTED,
+                SimulationEventType.ROMANCE_RELATIONSHIP_STATUS_CHANGE_REQUESTED,
+                SimulationEventType.ROMANCE_RELATIONSHIP_ENDED,
+                SimulationEventType.ROMANCE_FLAG_SET_REQUESTED,
+                SimulationEventType.ROMANCE_FLAG_REMOVE_REQUESTED,
+            }:
+                self._apply_romance_event(event.event_type, payload)
+            elif event.event_type == SimulationEventType.ROMANCE_TO_FAMILY_SIGNAL:
+                self.romance_to_family_signal = dict(payload)
 
     def bind_family_context(self, state: LifeState, rules: dict[str, Any]) -> None:
         self._family_state_age = state.age
@@ -335,6 +388,42 @@ class ResultCollector:
             self._family_working,
             self._family_state_age,
             self._family_rules,
+        )
+
+    def _apply_social_event(
+        self,
+        event_type: SimulationEventType,
+        payload: dict[str, Any],
+    ) -> None:
+        if self._social_working is None:
+            return
+        self._social_working = self.social_processor.process(
+            event_type,
+            payload,
+            self._social_working,
+            self._social_state_age,
+        )
+
+    def _apply_romance_event(
+        self,
+        event_type: SimulationEventType,
+        payload: dict[str, Any],
+    ) -> None:
+        if self._romance_working is None:
+            return
+        if event_type == SimulationEventType.ROMANCE_STATE_UPDATE_REQUESTED:
+            patch = dict(payload.get("romance", {}))
+            if patch:
+                merged = {**self._romance_working.to_life_state_dict(), **patch}
+                self._romance_working = RomanceState.from_life_state_dict(merged)
+            if payload.get("romance_to_family_signal"):
+                self.romance_to_family_signal = dict(payload["romance_to_family_signal"])
+            return
+        self._romance_working = self.romance_processor.process(
+            event_type,
+            payload,
+            self._romance_working,
+            self._romance_state_age,
         )
 
     def apply_to_state(
@@ -398,6 +487,12 @@ class ResultCollector:
         if self._achievement_working is not None:
             next_state.achievements = self._achievement_working.to_life_state_dict()
 
+        if self._social_working is not None:
+            next_state.social = self._social_working.to_life_state_dict()
+
+        if self._romance_working is not None:
+            next_state.romance = self._romance_working.to_life_state_dict()
+
         if self.death_reason is not None:
             next_state.is_dead = True
             next_state.death_reason = self.death_reason
@@ -427,6 +522,13 @@ class ResultCollector:
             MainlineState.from_life_state_dict(after.mainline),
             {},
         )
+
+        social_state = SocialState.from_life_state_dict(after.social)
+        social_summary = build_social_summary(social_state, after.age)
+        social_narrative = build_social_narrative_lines(social_state)
+        romance_state = RomanceState.from_life_state_dict(after.romance)
+        romance_summary = build_romance_summary(romance_state, after.age)
+        romance_narrative = build_romance_narrative_lines(romance_state)
 
         return YearResult(
             life_id=before.life_id,
@@ -514,4 +616,25 @@ class ResultCollector:
             achievement_points_gained=self.achievement_points_gained,
             milestones_this_year=list(self.milestones_this_year),
             achievement_narrative=list(self.achievement_narrative),
+            social_changes={
+                "summary": social_summary,
+                "new_relationships": social_summary.get("recent_new_relationships", []),
+                "changed_relationships": social_summary.get("recent_changed_relationships", []),
+                "removed_relationships": list(social_state.removed_relationships_this_year),
+            },
+            new_social_relationships=list(social_summary.get("recent_new_relationships", [])),
+            changed_social_relationships=list(social_summary.get("recent_changed_relationships", [])),
+            removed_social_relationships=list(social_state.removed_relationships_this_year),
+            social_narrative=social_narrative,
+            romance_changes={
+                "summary": romance_summary,
+                "new_candidates": romance_summary.get("recent_candidates", []),
+                "recent_changes": list(romance_state.romance_changes_this_year),
+                "ended_relationships": list(romance_state.ended_relationships_this_year),
+            },
+            new_romantic_candidates=list(romance_summary.get("recent_candidates", [])),
+            current_romantic_relationship=romance_summary.get("current_relationship"),
+            ended_romantic_relationships=list(romance_state.ended_relationships_this_year),
+            romance_narrative=romance_narrative,
+            romance_to_family_signal=self.romance_to_family_signal,
         )

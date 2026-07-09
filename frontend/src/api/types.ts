@@ -16,6 +16,8 @@ export type LifeState = {
   legal?: Record<string, unknown>;
   pending_legal_event?: Record<string, unknown> | null;
   mainline?: Record<string, unknown>;
+  social?: Record<string, unknown>;
+  romance?: Record<string, unknown>;
   rule_version: string;
 };
 
@@ -108,6 +110,17 @@ export type YearResult = {
   achievement_points_gained: number;
   milestones_this_year: Array<Record<string, unknown>>;
   achievement_narrative: string[];
+  social_changes?: Record<string, unknown>;
+  new_social_relationships?: Array<Record<string, unknown>>;
+  changed_social_relationships?: Array<Record<string, unknown>>;
+  removed_social_relationships?: string[];
+  social_narrative?: string[];
+  romance_changes?: Record<string, unknown>;
+  new_romantic_candidates?: Array<Record<string, unknown>>;
+  current_romantic_relationship?: Record<string, unknown> | null;
+  ended_romantic_relationships?: string[];
+  romance_narrative?: string[];
+  romance_to_family_signal?: Record<string, unknown> | null;
 };
 
 export type HeirShare = {

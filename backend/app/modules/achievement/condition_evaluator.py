@@ -7,6 +7,8 @@ from app.modules.education.models import EducationState
 from app.modules.family.models import FamilyState
 from app.modules.legal.models import LegalState
 from app.modules.mainline.models import MainlineState
+from app.modules.romance.models import RomanceState
+from app.modules.social.models import SocialState
 
 
 class AchievementConditionError(ValueError):
@@ -44,6 +46,18 @@ class AchievementConditionEvaluator:
         "turbulent_life_categories_min",
         "calm_life_on_death",
         "generation_min",
+        "friend_count_min",
+        "has_best_friend",
+        "has_mentor",
+        "has_rival",
+        "has_benefactor",
+        "has_romantic_candidate",
+        "has_current_romantic_relationship",
+        "is_dating",
+        "is_single",
+        "romance_stability_min",
+        "years_in_relationship_min",
+        "romance_flag_exists",
     }
 
     def matches(
@@ -86,10 +100,12 @@ class AchievementConditionEvaluator:
         inheritance_result: dict[str, Any] | None,
     ) -> bool:
         family = FamilyState.from_life_state_dict(state.family)
+        social = SocialState.from_life_state_dict(state.social)
         legal = LegalState.from_life_state_dict(state.legal)
         education = EducationState.from_life_state_dict(state.education, {})
         career = CareerState.from_life_state_dict(state.career, {})
         mainline = MainlineState.from_life_state_dict(state.mainline)
+        social = SocialState.from_life_state_dict(state.social)
         flags = {**state.flags, **achievement_state.achievement_flags}
 
         if key == "age_min":
@@ -178,6 +194,38 @@ class AchievementConditionEvaluator:
             return not legal.has_criminal_record and state.age >= int(expected.get("age_min", 70))
         if key == "generation_min":
             return int(family.generation) >= int(expected)
+        if key == "friend_count_min":
+            return social.friend_count() >= int(expected)
+        if key == "has_best_friend":
+            has_best = social.has_relationship_type("best_friend")
+            return has_best if bool(expected) else not has_best
+        if key == "has_mentor":
+            has_mentor = social.has_relationship_type("mentor")
+            return has_mentor if bool(expected) else not has_mentor
+        if key == "has_rival":
+            has_rival = social.has_relationship_type("rival")
+            return has_rival if bool(expected) else not has_rival
+        if key == "has_benefactor":
+            has_benefactor = social.has_relationship_type("benefactor")
+            return has_benefactor if bool(expected) else not has_benefactor
+        romance = RomanceState.from_life_state_dict(state.romance)
+        if key == "has_romantic_candidate":
+            has_candidate = romance.has_romantic_candidate()
+            return has_candidate if bool(expected) else not has_candidate
+        if key == "has_current_romantic_relationship":
+            has_rel = romance.get_current_relationship() is not None
+            return has_rel if bool(expected) else not has_rel
+        if key == "is_dating":
+            return romance.is_dating() is bool(expected)
+        if key == "is_single":
+            return romance.is_single() is bool(expected)
+        if key == "romance_stability_min":
+            rel = romance.get_current_relationship()
+            return rel is not None and rel.stability >= int(expected)
+        if key == "years_in_relationship_min":
+            return romance.years_in_current_relationship >= int(expected)
+        if key == "romance_flag_exists":
+            return str(expected) in romance.romance_flags
         raise AchievementConditionError(f"Unhandled achievement condition key: {key}")
 
     def _pair(self, expected: Any) -> tuple[str, int]:

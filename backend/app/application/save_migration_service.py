@@ -3,6 +3,8 @@ from typing import Any
 
 from app.engine.simulation_context import LifeState, SimulationEvent, YearResult
 from app.modules.achievement.rules import build_default_achievement_state
+from app.modules.social.rules import build_default_social_state
+from app.modules.romance.rules import build_default_romance_state
 from app.modules.legal.rules import build_default_legal_state
 from app.modules.mainline.rules import build_default_mainline_state
 from app.modules.timeline.constants import SAVE_VERSION, SNAPSHOT_VERSION
@@ -19,6 +21,10 @@ class SaveMigrationService:
             data["mainline"] = build_default_mainline_state(rules).to_life_state_dict()
         if not data.get("achievements"):
             data["achievements"] = build_default_achievement_state(rules).to_life_state_dict()
+        if not data.get("social"):
+            data["social"] = build_default_social_state(rules).to_life_state_dict()
+        if not data.get("romance"):
+            data["romance"] = build_default_romance_state(rules).to_life_state_dict()
         if data.get("flags") is None:
             data["flags"] = {}
         return LifeState.model_validate(data)
@@ -92,6 +98,8 @@ class SaveMigrationService:
             "legal": partial.get("legal", {}),
             "mainline": partial.get("mainline", {}),
             "achievements": partial.get("achievements", {}),
+            "social": partial.get("social", {}),
+            "romance": partial.get("romance", {}),
             "rule_version": partial.get("rule_version", "v1"),
         }
         base.update(partial)

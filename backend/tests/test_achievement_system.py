@@ -26,7 +26,7 @@ def test_create_life_has_stable_achievement_state() -> None:
 
 def test_achievement_library_loads() -> None:
     library = AchievementLibraryLoader().load()
-    assert library.achievement_count == 32
+    assert library.achievement_count == 39
     AchievementValidator().validate_library(library)
 
 

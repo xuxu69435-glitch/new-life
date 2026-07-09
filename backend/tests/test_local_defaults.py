@@ -87,12 +87,61 @@ def test_vite_default_port_is_1234() -> None:
 
 def test_local_start_script_outputs_local_urls() -> None:
     script = (PROJECT_ROOT / "scripts" / "local_start.ps1").read_text(encoding="utf-8")
-    assert "http://127.0.0.1:1234" in script
-    assert "http://127.0.0.1:4321" in script
-    assert "http://127.0.0.1:4321/health" in script
-    assert "50001" not in script
-    assert "50002" not in script
-    assert "ncgw1503677.bohrium.tech" not in script
+    common = (PROJECT_ROOT / "scripts" / "_local_common.ps1").read_text(encoding="utf-8")
+    combined = script + common
+    assert "http://127.0.0.1:1234" in combined
+    assert "http://127.0.0.1:4321" in combined
+    assert "http://127.0.0.1:4321/health" in combined
+    assert "50001" not in combined
+    assert "50002" not in combined
+    assert "ncgw1503677.bohrium.tech" not in combined
+
+
+def test_launcher_scripts_exist() -> None:
+    for name in (
+        "local_start.ps1",
+        "local_stop.ps1",
+        "start_game.ps1",
+        "local_status.ps1",
+        "local_open.ps1",
+        "local_backup_data.ps1",
+        "local_reset_data.ps1",
+    ):
+        assert (PROJECT_ROOT / "scripts" / name).exists()
+
+
+def test_launcher_scripts_use_local_ports_only() -> None:
+    script_names = (
+        "local_start.ps1",
+        "local_stop.ps1",
+        "start_game.ps1",
+        "local_status.ps1",
+        "local_open.ps1",
+        "_local_common.ps1",
+    )
+    for name in script_names:
+        content = (PROJECT_ROOT / "scripts" / name).read_text(encoding="utf-8")
+        assert "50001" not in content
+        assert "50002" not in content
+        assert "5173" not in content
+        assert "8000" not in content
+        assert "ncgw1503677.bohrium.tech" not in content
+
+
+def test_start_game_waits_for_health_and_opens_browser() -> None:
+    script = (PROJECT_ROOT / "scripts" / "start_game.ps1").read_text(encoding="utf-8")
+    assert "Wait-BackendHealth" in script
+    assert "Wait-FrontendAccessible" in script
+    assert "Open-GameBrowser" in script
+    assert "TimeoutSeconds 60" in script or "TimeoutSeconds = 60" in script
+
+
+def test_gitignore_ignores_local_run_and_save_data() -> None:
+    gitignore = (PROJECT_ROOT / ".gitignore").read_text(encoding="utf-8")
+    assert ".local-run/" in gitignore
+    assert "backend/data/" in gitignore
+    assert "backend/backups/" in gitignore
+    assert "*.sqlite3" in gitignore
 
 
 def test_env_example_uses_local_defaults() -> None:

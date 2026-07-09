@@ -10,6 +10,33 @@ class RandomEventV1DrawService:
     def __init__(self, matcher: RandomEventConditionMatcher | None = None) -> None:
         self.matcher = matcher or RandomEventConditionMatcher()
 
+    def eligible_social_events(
+        self,
+        events: list[V1EventDefinition],
+        state: LifeState,
+        event_history: dict[str, Any],
+        *,
+        blocked_sub_categories: set[str] | None = None,
+    ) -> list[V1EventDefinition]:
+        eligible: list[V1EventDefinition] = []
+        blocked = blocked_sub_categories or set()
+        for event in events:
+            if event.pool_type != "social":
+                continue
+            if not event.is_drawable():
+                continue
+            sub_category = str(getattr(event, "sub_category", "") or event.conditions.get("sub_category", ""))
+            if sub_category in blocked:
+                continue
+            if not self.matcher.matches(event, state):
+                continue
+            if not self._repeat_allowed(event, state.age, event_history):
+                continue
+            if event.weight <= 0:
+                continue
+            eligible.append(event)
+        return eligible
+
     def eligible_normal_events(
         self,
         events: list[V1EventDefinition],

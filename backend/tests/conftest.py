@@ -15,6 +15,8 @@ from app.modules.family.rules import build_default_family_state
 from app.modules.legal.rules import build_default_legal_state
 from app.modules.achievement.rules import build_default_achievement_state
 from app.modules.mainline.rules import build_default_mainline_state
+from app.modules.romance.rules import build_default_romance_state
+from app.modules.social.rules import build_default_social_state
 from app.rules.rule_loader import RuleLoader
 
 
@@ -48,6 +50,8 @@ def life_state(rules: dict) -> LifeState:
         legal=build_default_legal_state(rules).to_life_state_dict(),
         mainline=build_default_mainline_state(rules).to_life_state_dict(),
         achievements=build_default_achievement_state(rules).to_life_state_dict(),
+        social=build_default_social_state(rules).to_life_state_dict(),
+        romance=build_default_romance_state(rules).to_life_state_dict(),
         assets=dict(rules["default_assets"]),
         rule_version=rules["version"],
     )

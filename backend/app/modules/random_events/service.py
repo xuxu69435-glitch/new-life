@@ -2,6 +2,7 @@ from typing import Any
 
 from app.engine.simulation_context import SimulationContext, SimulationEventType
 from app.modules.random_events.choice_effect_resolver import RandomEventChoiceEffectResolver
+from app.modules.random_events.draw_state import blocked_social_sub_categories, build_draw_state
 from app.modules.random_events.effect_resolver import RandomEventEffectResolver
 from app.modules.random_events.library_models import PendingRandomEvent, V1EventDefinition
 from app.modules.random_events.models import RandomEventDefinition
@@ -10,6 +11,7 @@ from app.modules.random_events.v1_draw import RandomEventV1DrawService
 from app.modules.legal.models import LegalState
 from app.modules.legal.rules import blocks_normal_random_events
 from app.rules.random_event_library_loader import RandomEventLibraryLoader
+from app.rules.social_event_library_loader import SocialEventLibraryLoader
 
 
 class RandomEventsService:
@@ -21,6 +23,7 @@ class RandomEventsService:
         effect_resolver: RandomEventEffectResolver | None = None,
         choice_effect_resolver: RandomEventChoiceEffectResolver | None = None,
         library_loader: RandomEventLibraryLoader | None = None,
+        social_library_loader: SocialEventLibraryLoader | None = None,
         draw_service: RandomEventV1DrawService | None = None,
     ) -> None:
         self.effect_resolver = effect_resolver or RandomEventEffectResolver()
@@ -28,10 +31,13 @@ class RandomEventsService:
             self.effect_resolver
         )
         self.library_loader = library_loader or RandomEventLibraryLoader()
+        self.social_library_loader = social_library_loader or SocialEventLibraryLoader()
         self.draw_service = draw_service or RandomEventV1DrawService()
 
     def run(self, context: SimulationContext) -> None:
         if context.state.pending_random_event is not None:
+            return
+        if context.state.is_dead:
             return
 
         legal = LegalState.from_life_state_dict(context.state.legal)
@@ -63,8 +69,7 @@ class RandomEventsService:
         if pending is None:
             raise ValueError("No pending random event to resolve.")
 
-        library = self.library_loader.load()
-        event = library.by_id().get(str(pending["event_id"]))
+        event = self._find_event(str(pending["event_id"]))
         if event is None:
             raise ValueError(f"Unknown pending event: {pending['event_id']}")
 
@@ -109,14 +114,24 @@ class RandomEventsService:
             "effects_text": choice.effects_text,
         }
 
+    def _find_event(self, event_id: str) -> V1EventDefinition | None:
+        if event_id.startswith("S"):
+            return self.social_library_loader.load().by_id().get(event_id)
+        return self.library_loader.load().by_id().get(event_id)
+
     def _run_v1_library(self, context: SimulationContext, random_rules: dict) -> None:
+        draw_state = build_draw_state(context)
+        if draw_state.is_dead:
+            return
+
         library = self.library_loader.load()
         event_history = self._event_history(context)
         death_limit = float(random_rules.get("direct_death_probability_limit", 0.03))
+        legal = LegalState.from_life_state_dict(draw_state.legal)
 
         death_pool = self.draw_service.eligible_direct_death_events(
             library.events,
-            context.state,
+            draw_state,
             event_history,
         )
         if death_pool and self.draw_service.should_enter_direct_death_pool(
@@ -130,10 +145,21 @@ class RandomEventsService:
 
         normal_pool = self.draw_service.eligible_normal_events(
             library.events,
-            context.state,
+            draw_state,
             event_history,
         )
-        selected = self.draw_service.draw_by_weight(normal_pool, context.rng)
+        social_pool: list[V1EventDefinition] = []
+        if random_rules.get("use_social_library", False):
+            social_library = self.social_library_loader.load()
+            social_pool = self.draw_service.eligible_social_events(
+                social_library.events,
+                draw_state,
+                event_history,
+                blocked_sub_categories=blocked_social_sub_categories(legal),
+            )
+
+        combined_pool = normal_pool + social_pool
+        selected = self.draw_service.draw_by_weight(combined_pool, context.rng)
         if selected is None:
             return
 

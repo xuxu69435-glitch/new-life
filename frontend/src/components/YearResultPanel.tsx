@@ -28,6 +28,22 @@ export function YearResultPanel() {
               ) : null}
             </div>
           ) : null}
+          {result.social_narrative && result.social_narrative.length > 0 ? (
+            <div className="change-block">
+              <h3>Social changes</h3>
+              {result.social_narrative.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          ) : null}
+          {result.romance_narrative && result.romance_narrative.length > 0 ? (
+            <div className="change-block">
+              <h3>Romance changes</h3>
+              {result.romance_narrative.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          ) : null}
           {result.pending_random_event ? (
             <div className="change-block">
               <h3>Pending random event</h3>

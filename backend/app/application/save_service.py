@@ -11,8 +11,10 @@ from app.modules.legal.rules import build_default_legal_state
 from app.modules.achievement.rules import build_default_achievement_state
 from app.modules.mainline.rules import build_default_mainline_state
 from app.modules.education.rules import build_default_education_state
-from app.modules.career.rules import build_default_career_state
 from app.modules.health.rules import build_default_health_state
+from app.modules.career.rules import build_default_career_state
+from app.modules.social.rules import build_default_social_state
+from app.modules.romance.rules import build_default_romance_state
 from app.modules.timeline.generator import EventLogBuilder, TimelineGenerator
 from app.modules.timeline.models import LifeSaveRecord, LifeYearSnapshot
 from app.modules.timeline.read_service import TimelineReadService
@@ -82,6 +84,8 @@ class SaveService:
             legal=build_default_legal_state(rules).to_life_state_dict(),
             mainline=build_default_mainline_state(rules).to_life_state_dict(),
             achievements=build_default_achievement_state(rules).to_life_state_dict(),
+            social=build_default_social_state(rules).to_life_state_dict(),
+            romance=build_default_romance_state(rules).to_life_state_dict(),
             rule_version=rule_version,
         )
         if source_life_id is not None:

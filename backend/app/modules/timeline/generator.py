@@ -12,6 +12,8 @@ class EventLogBuilder:
         "mainline": "mainline_task",
         "achievement": "achievement",
         "family": "family",
+        "social": "relationship",
+        "romance": "relationship",
         "education": "education",
         "career": "career",
         "health": "health",
@@ -383,6 +385,159 @@ class TimelineGenerator:
                     related_snapshot_id=snapshot_id,
                 )
             )
+
+        if result.new_social_relationships or result.removed_social_relationships:
+            for item in result.new_social_relationships:
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="社交关系",
+                        summary=f"结识{item.get('person_name', '新朋友')}",
+                        entry_type="social",
+                        category="relationship",
+                        source_module="social",
+                        importance=ENTRY_IMPORTANCE["social"],
+                        tags=["social", str(item.get("relationship_type", ""))],
+                        display_text=f"结识{item.get('person_name', '新朋友')}",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
+            for rel_id in result.removed_social_relationships:
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="关系破裂",
+                        summary=f"关系 {rel_id} 结束",
+                        entry_type="social",
+                        category="relationship",
+                        source_module="social",
+                        source_id=rel_id,
+                        importance=ENTRY_IMPORTANCE["social"] + 5,
+                        tags=["social", "broken"],
+                        display_text="一段重要关系破裂。",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
+            for item in result.changed_social_relationships:
+                if item.get("relationship_type") == "best_friend" or item.get("status") == "important":
+                    entries.append(
+                        TimelineEntry(
+                            life_id=life_id,
+                            age=age,
+                            title="挚友",
+                            summary=f"与{item.get('person_name', '朋友')}关系升级",
+                            entry_type="social",
+                            category="relationship",
+                            source_module="social",
+                            importance=ENTRY_IMPORTANCE["social"] + 3,
+                            tags=["social", "best_friend"],
+                            display_text=f"你与{item.get('person_name', '朋友')}成为挚友。",
+                            related_snapshot_id=snapshot_id,
+                        )
+                    )
+                elif item.get("relationship_type") == "rival":
+                    entries.append(
+                        TimelineEntry(
+                            life_id=life_id,
+                            age=age,
+                            title="竞争关系",
+                            summary=f"与{item.get('person_name', '同事')}矛盾加深",
+                            entry_type="social",
+                            category="relationship",
+                            source_module="social",
+                            importance=ENTRY_IMPORTANCE["social"] + 2,
+                            tags=["social", "rival"],
+                            display_text=f"你与{item.get('person_name', '同事')}的矛盾加深。",
+                            related_snapshot_id=snapshot_id,
+                        )
+                    )
+
+        if result.new_romantic_candidates or result.romance_changes or result.ended_romantic_relationships:
+            for item in result.new_romantic_candidates:
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="情感变化",
+                        summary=f"对{item.get('name', '某人')}产生好感",
+                        entry_type="romance",
+                        category="relationship",
+                        source_module="romance",
+                        importance=ENTRY_IMPORTANCE["romance"],
+                        tags=["romance", "candidate"],
+                        display_text=f"你对{item.get('name', '某人')}产生了好感。",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
+            current = result.current_romantic_relationship or {}
+            status = str(current.get("status", ""))
+            partner = str(current.get("partner_name", "恋人"))
+            if status == "dating":
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="开始恋爱",
+                        summary=f"与{partner}开始恋爱",
+                        entry_type="romance",
+                        category="relationship",
+                        source_module="romance",
+                        importance=ENTRY_IMPORTANCE["romance"] + 5,
+                        tags=["romance", "dating"],
+                        display_text=f"你与{partner}开始了一段恋爱关系。",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
+            elif status == "cooling_off":
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="关系冷淡",
+                        summary=f"与{partner}关系冷淡",
+                        entry_type="romance",
+                        category="relationship",
+                        source_module="romance",
+                        importance=ENTRY_IMPORTANCE["romance"] + 3,
+                        tags=["romance", "cooling_off"],
+                        display_text=f"你与{partner}的关系进入冷淡期。",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
+            elif status == "engagement_intent":
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="订婚意向",
+                        summary=f"与{partner}考虑未来",
+                        entry_type="romance",
+                        category="relationship",
+                        source_module="romance",
+                        importance=ENTRY_IMPORTANCE["romance"] + 8,
+                        tags=["romance", "engagement_intent"],
+                        display_text=f"你与{partner}开始认真考虑未来。",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
+            for rel_id in result.ended_romantic_relationships:
+                entries.append(
+                    TimelineEntry(
+                        life_id=life_id,
+                        age=age,
+                        title="恋爱结束",
+                        summary="结束一段恋爱关系",
+                        entry_type="romance",
+                        category="relationship",
+                        source_module="romance",
+                        importance=ENTRY_IMPORTANCE["romance"] + 6,
+                        tags=["romance", "broken_up"],
+                        display_text="你结束了一段恋爱关系。",
+                        related_snapshot_id=snapshot_id,
+                    )
+                )
 
         if result.education_graduated_this_year or (
             result.education_stage_before != result.education_stage_after

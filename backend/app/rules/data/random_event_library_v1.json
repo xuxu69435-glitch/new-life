@@ -1548,8 +1548,9 @@
       "conditions": {
         "min_age": 6,
         "max_age": 18,
-        "unsupported_condition": {
-          "text": "社交能力高于50"
+        "attribute_above": {
+          "key": "charm",
+          "value": 50
         }
       },
       "weight_tier": "中高概率",
@@ -1575,6 +1576,16 @@
               "target": "intelligence",
               "value": -1,
               "reason": "学习能力减1"
+            },
+            {
+              "type": "social_relationship_created",
+              "name": "好朋友",
+              "relationship_type": "friend",
+              "role": "friend",
+              "source": "random_event",
+              "closeness": 75,
+              "trust": 70,
+              "reason": "结交好朋友"
             }
           ],
           "requires_confirmation": false,
@@ -5072,9 +5083,7 @@
       "conditions": {
         "min_age": 22,
         "max_age": 55,
-        "unsupported_condition": {
-          "text": "职场关系高于55"
-        }
+        "employment_status_in": ["employed"]
       },
       "weight_tier": "中概率",
       "weight": 5,
@@ -5089,16 +5098,20 @@
           "effects_text": "职业能力加6，职场关系加4",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "职业能力加6",
-              "value": 0,
-              "reason": "not implemented: 职业能力加6"
+              "type": "attribute_change",
+              "target": "intelligence",
+              "value": 6,
+              "reason": "职业能力加6"
             },
             {
-              "type": "unsupported_effect",
-              "target": "职场关系加4",
-              "value": 0,
-              "reason": "not implemented: 职场关系加4"
+              "type": "social_relationship_created",
+              "name": "职场前辈",
+              "relationship_type": "mentor",
+              "role": "mentor",
+              "source": "random_event",
+              "closeness": 60,
+              "trust": 80,
+              "reason": "职场贵人"
             }
           ],
           "requires_confirmation": false,
@@ -5111,10 +5124,14 @@
           "effects_text": "职场关系加1",
           "effects": [
             {
-              "type": "unsupported_effect",
-              "target": "职场关系加1",
-              "value": 0,
-              "reason": "not implemented: 职场关系加1"
+              "type": "social_relationship_created",
+              "name": "职场熟人",
+              "relationship_type": "acquaintance",
+              "role": "coworker",
+              "source": "random_event",
+              "closeness": 40,
+              "trust": 45,
+              "reason": "保持礼貌距离"
             }
           ],
           "requires_confirmation": false,
@@ -5145,10 +5162,8 @@
       ],
       "may_cause_death": false,
       "affects_future": true,
-      "implementation_status": "partial",
-      "unsupported_reasons": [
-        "contains unsupported_effect"
-      ],
+      "implementation_status": "active",
+      "unsupported_reasons": [],
       "source_text": "E049职场贵人\n\n年龄段：22到55岁\n触发条件：职场关系高于55\n出现权重：中概率\n是否可重复：可重复，冷却4年\n事件文本：一位前辈愿意指导你，帮你看清职业方向。\n选项一：认真请教\n效果：职业能力加6，职场关系加4\n选项二：保持礼貌距离\n效果：职场关系加1\n选项三：过度依赖\n效果：职业能力加2，独立性减3",
       "pool_type": "normal"
     },

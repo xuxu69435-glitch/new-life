@@ -3,7 +3,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 ImplementationStatus = Literal["active", "partial", "planned"]
-PoolType = Literal["normal", "direct_death", "system"]
+PoolType = Literal["normal", "direct_death", "system", "social"]
 RepeatPolicy = Literal["once", "repeatable", "max_once"]
 
 
@@ -82,4 +82,22 @@ class RandomEventLibraryV1(BaseModel):
     events: list[V1EventDefinition] = Field(default_factory=list)
 
     def by_id(self) -> dict[str, V1EventDefinition]:
+        return {event.event_id: event for event in self.events}
+
+
+class SocialEventDefinition(V1EventDefinition):
+    title: str = ""
+    sub_category: str = ""
+    creates_person: bool = False
+    target_relationship_types: list[str] = Field(default_factory=list)
+    repeatable: bool = True
+
+
+class SocialEventLibraryV1(BaseModel):
+    version: str = "v1"
+    source: str = ""
+    event_count: int = 0
+    events: list[SocialEventDefinition] = Field(default_factory=list)
+
+    def by_id(self) -> dict[str, SocialEventDefinition]:
         return {event.event_id: event for event in self.events}

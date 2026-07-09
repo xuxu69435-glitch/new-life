@@ -32,6 +32,10 @@ class AnnualNarrativeInput(BaseModel):
     child_born_this_year: bool = False
     relationship_status_before: str | None = None
     relationship_status_after: str | None = None
+    social_changes: dict[str, Any] = Field(default_factory=dict)
+    social_narrative: list[str] = Field(default_factory=list)
+    romance_changes: dict[str, Any] = Field(default_factory=dict)
+    romance_narrative: list[str] = Field(default_factory=list)
 
 
 class DisplaySection(BaseModel):

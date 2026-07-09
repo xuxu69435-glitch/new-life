@@ -3,6 +3,8 @@ from typing import Any
 from app.engine.simulation_context import SimulationContext
 from app.modules.mainline.models import MainlineState
 from app.modules.narrative.models import AnnualNarrativeInput
+from app.modules.romance.summary import build_romance_narrative_lines, build_romance_summary
+from app.modules.social.summary import build_social_narrative_lines, build_social_summary
 
 
 def build_annual_narrative_input(context: SimulationContext) -> AnnualNarrativeInput:
@@ -31,6 +33,22 @@ def build_annual_narrative_input(context: SimulationContext) -> AnnualNarrativeI
         or collector.family_processor.child_born_this_year
         or abs(health_score_delta) >= 1
     )
+
+    social_changes: dict[str, Any] = {}
+    social_narrative: list[str] = []
+    if collector._social_working is not None:
+        social_changes = {
+            "summary": build_social_summary(collector._social_working, state.age + 1),
+        }
+        social_narrative = build_social_narrative_lines(collector._social_working)
+
+    romance_changes: dict[str, Any] = {}
+    romance_narrative: list[str] = []
+    if collector._romance_working is not None:
+        romance_changes = {
+            "summary": build_romance_summary(collector._romance_working, state.age + 1),
+        }
+        romance_narrative = build_romance_narrative_lines(collector._romance_working)
 
     return AnnualNarrativeInput(
         life_id=state.life_id,
@@ -79,4 +97,8 @@ def build_annual_narrative_input(context: SimulationContext) -> AnnualNarrativeI
         child_born_this_year=collector.family_processor.child_born_this_year,
         relationship_status_before=collector.family_processor.relationship_status_before,
         relationship_status_after=collector.family_processor.relationship_status_after,
+        social_changes=social_changes,
+        social_narrative=social_narrative,
+        romance_changes=romance_changes,
+        romance_narrative=romance_narrative,
     )

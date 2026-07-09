@@ -1,34 +1,59 @@
-$ErrorActionPreference = "SilentlyContinue"
+﻿$ErrorActionPreference = "SilentlyContinue"
 
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
-$RunDir = Join-Path $ProjectRoot ".local-run"
+. (Join-Path $PSScriptRoot "_local_common.ps1")
 
-function Stop-ProcessByPort {
-    param([int]$Port)
-    $connections = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-    foreach ($connection in $connections) {
-        if ($connection.OwningProcess -gt 0) {
-            Stop-Process -Id $connection.OwningProcess -Force -ErrorAction SilentlyContinue
-        }
-    }
+Initialize-LocalRunDirectories
+Write-LauncherLog "local_stop.ps1 开始执行"
+
+$runDir = Get-RunDir
+$backendStopped = $false
+$frontendStopped = $false
+
+$backendPid = Get-PidFromFile (Join-Path $runDir "backend.pid")
+$frontendPid = Get-PidFromFile (Join-Path $runDir "frontend.pid")
+
+if (Stop-ProjectProcessByPid -ProcessId $backendPid -IsProjectProcess ${function:Test-IsProjectBackendProcess}) {
+    $backendStopped = $true
+    Write-LauncherLog "已停止记录的后端进程 PID=$backendPid"
 }
 
-function Stop-ProcessByPidFile {
-    param([string]$PidFile)
-    if (-not (Test-Path $PidFile)) {
-        return
-    }
-    $processId = Get-Content $PidFile -ErrorAction SilentlyContinue
-    if ($processId -match '^\d+$') {
-        Stop-Process -Id ([int]$processId) -Force -ErrorAction SilentlyContinue
-    }
-    Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
+if (Stop-ProjectProcessByPid -ProcessId $frontendPid -IsProjectProcess ${function:Test-IsProjectFrontendProcess}) {
+    $frontendStopped = $true
+    Write-LauncherLog "已停止记录的前端进程 PID=$frontendPid"
 }
 
-Stop-ProcessByPidFile (Join-Path $RunDir "backend.pid")
-Stop-ProcessByPidFile (Join-Path $RunDir "frontend.pid")
+if (Stop-ProjectListenersOnPort -Port $script:LocalBackendPort -IsProjectProcess ${function:Test-IsProjectBackendProcess}) {
+    $backendStopped = $true
+    Write-LauncherLog "已停止监听 $($script:LocalBackendPort) 的本项目后端进程"
+}
 
-Stop-ProcessByPort -Port 4321
-Stop-ProcessByPort -Port 1234
+if (Stop-ProjectListenersOnPort -Port $script:LocalFrontendPort -IsProjectProcess ${function:Test-IsProjectFrontendProcess}) {
+    $frontendStopped = $true
+    Write-LauncherLog "已停止监听 $($script:LocalFrontendPort) 的本项目前端进程"
+}
 
-Write-Host "已尝试停止本地后端(4321)和前端(1234)进程。"
+Remove-Item (Join-Path $runDir "backend.pid") -Force -ErrorAction SilentlyContinue
+Remove-Item (Join-Path $runDir "frontend.pid") -Force -ErrorAction SilentlyContinue
+Remove-Item (Get-RunStatePath) -Force -ErrorAction SilentlyContinue
+
+Start-Sleep -Seconds 1
+
+$backendStillRunning = Test-ProjectBackendRunning
+$frontendStillRunning = Test-ProjectFrontendRunning
+
+Write-Host ""
+if ($backendStopped -or -not $backendStillRunning) {
+    Write-Host "后端已停止（端口 $($script:LocalBackendPort) 未被本项目占用）。"
+}
+else {
+    Write-Host "警告:后端可能仍在运行，请检查日志:$(Join-Path (Get-LogDir) 'backend.log')"
+}
+
+if ($frontendStopped -or -not $frontendStillRunning) {
+    Write-Host "前端已停止（端口 $($script:LocalFrontendPort) 未被本项目占用）。"
+}
+else {
+    Write-Host "警告:前端可能仍在运行，请检查日志:$(Join-Path (Get-LogDir) 'frontend.log')"
+}
+
+Write-LauncherLog "local_stop.ps1 完成。backendRunning=$backendStillRunning frontendRunning=$frontendStillRunning"
