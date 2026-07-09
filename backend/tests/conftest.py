@@ -18,6 +18,16 @@ from app.modules.mainline.rules import build_default_mainline_state
 from app.rules.rule_loader import RuleLoader
 
 
+@pytest.fixture(autouse=True)
+def use_memory_repository_for_unit_tests(monkeypatch):
+    monkeypatch.setenv("SAVE_REPOSITORY_TYPE", "memory")
+    from app.infrastructure.config import get_settings
+    from app.infrastructure.save.sqlite_db import clear_sqlite_caches
+
+    get_settings.cache_clear()
+    clear_sqlite_caches()
+
+
 @pytest.fixture
 def rules() -> dict:
     return RuleLoader().load("v1")

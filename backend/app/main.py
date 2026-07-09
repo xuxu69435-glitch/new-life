@@ -48,6 +48,10 @@ def validate_default_rules_on_startup() -> None:
     loader.load_default()
     if settings.save_repository_type == "postgres" and settings.auto_create_tables:
         init_database(create_tables=True)
+    if settings.save_repository_type == "sqlite":
+        from app.infrastructure.save.sqlite_db import init_sqlite_database
+
+        init_sqlite_database(create_tables=True)
 
 
 def _check_rules_loaded() -> bool:
@@ -61,16 +65,28 @@ def _check_rules_loaded() -> bool:
 
 
 def _check_database_connected() -> bool:
-    if settings.save_repository_type != "postgres":
+    repo_type = settings.save_repository_type.strip().lower()
+    if repo_type == "memory":
         return True
-    try:
-        from app.infrastructure.save.db import get_engine
+    if repo_type == "sqlite":
+        try:
+            from app.infrastructure.save.sqlite_db import get_sqlite_engine
 
-        with get_engine().connect() as connection:
-            connection.execute(text("SELECT 1"))
-        return True
-    except Exception:
-        return False
+            with get_sqlite_engine().connect() as connection:
+                connection.execute(text("SELECT 1"))
+            return True
+        except Exception:
+            return False
+    if repo_type == "postgres":
+        try:
+            from app.infrastructure.save.db import get_engine
+
+            with get_engine().connect() as connection:
+                connection.execute(text("SELECT 1"))
+            return True
+        except Exception:
+            return False
+    return True
 
 
 @app.get("/health")

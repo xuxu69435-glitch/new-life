@@ -8,14 +8,25 @@ MODULE_CONTRACTS.md
 backend/scripts/*
 !backend/scripts/init_db.py
 
+# Local game data (not committed)
+data/
+backend/data/
+backups/
+backend/backups/
+.local-run/
+*.sqlite
+*.sqlite3
+*.db
+logs/
+backend/logs/
+
 # Python
 __pycache__/
 .pytest_cache/
 *.py[cod]
 .venv/
+venv/
 .env
-*.sqlite
-*.db
 
 # Node / frontend
 node_modules/
